@@ -1,10 +1,10 @@
 import traceback
 
-from typing import Dict, Optional, Union
+from typing import Dict, Union
 
 from discord.ext.commands.context import Context
 
-# from Tools.Extractor.ctx_extractor import ContextExtractor
+from Tools.Extractor.ctx_extractor import ContextExtractor
 
 from Data.Cache.errorcode import ERROR_CODE
 
@@ -105,10 +105,10 @@ def print_Dictx(dictx: Dictx) -> None:
     
 
     
-# '''
-# __doc_var__=Dictx
-# '''
-# def print_context(ctx: Context) -> None:
-#     summrized: Dictx = ContextExtractor.summarize(ctx)
+'''
+__doc_var__=Dictx
+'''
+def print_context(ctx: Context) -> None:
+    summrized: Dictx = ContextExtractor.summarize(ctx)
     
-#     print_Dictx(summrized)
+    print_Dictx(summrized)
