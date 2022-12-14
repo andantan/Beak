@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
-from Types import (
+from typing import (
     Tuple,
-    Dict,
-    List
+    Dict
 )
+
 
 from Data.permission import Permission
 

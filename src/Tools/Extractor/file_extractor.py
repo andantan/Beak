@@ -60,4 +60,4 @@ def read_id() -> int:
         
         sys.exit(0)
 
-    return id
+    return __id

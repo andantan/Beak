@@ -5,7 +5,7 @@ from typing import (
 
 from final_class import final
 
-from Tools.Extractor.file_extractor import id_reader
+from Tools.Extractor.file_extractor import read_id
 
 from Data.Errors.exceptions import PermissionExceptions
 
@@ -90,7 +90,7 @@ class Permission:
             __h_attr = "_" + cls.__name__ + cls.__required__.__getitem__(0)
             
             if getattr(cls, __h_attr) == None:
-                setattr(cls, __h_attr, id_reader())
+                setattr(cls, __h_attr, read_id())
                     
             else:
                 raise PermissionExceptions.ReRegistrationException(

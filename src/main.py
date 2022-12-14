@@ -38,7 +38,7 @@ def booting(info: dict):
         global beak
 
         beak = Beak(__name__, **info)
-        fmsg = f"(id: {info.get('__id__')}, name: {info.get('__name__')})"
+        fmsg = f"(Bot_id: {info.get('__id__')}, name: {info.get('__name__')})"
 
         print(f"Allocated beak {fmsg}")
 
@@ -56,8 +56,8 @@ def registring():
     try:
         Permission.register()
 
-        print(f"Permission granted ({Permission.get_admin_id()})")
-
+        print(f"Permission granted (Admin_ID: {Permission.get_admin_id()})")
+        print(f"----------------------------------")
     except (
         PermissionExceptions.ReRegistrationException, 
         PermissionExceptions.RequiredAllocationException
@@ -82,7 +82,7 @@ async def on_ready():
     registring()
 
     AllocatedPool()
-    
+
 
 
 
