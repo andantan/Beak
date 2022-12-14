@@ -3,10 +3,10 @@ import sys
 import traceback
 
 
-def token_reader() -> str:
-    __target = "Token.txt"
+def read_token() -> str:
+    __target: str = "Token.txt"
 
-    path = os.path.join(
+    __path = os.path.join(
         os.getcwd(),
         "Admin",
         "Data",
@@ -14,10 +14,11 @@ def token_reader() -> str:
     )
 
     try:
-        with open(path, "r") as fd:
-            token = fd.readline().strip()
+        with open(__path, "r") as fd:
+            token: str = fd.readline().strip()
 
     except Exception as ERO:
+        #TODO: Need Logger
         print(f"Can't open or read file: {__target}")
         print(f" -> Error: {ERO}\n")
 
@@ -25,5 +26,38 @@ def token_reader() -> str:
 
         sys.exit(0)
 
-    
     return token
+
+
+def read_id() -> int:
+    __target: str = "Admin_ID.txt"
+
+    __path = os.path.join(
+        os.getcwd(),
+        "Admin",
+        "Data",
+        __target
+    )
+
+    try:
+        with open(__path, "r") as fd:
+            __fd_id: str = fd.readline().strip()
+            
+    except Exception as ERO:
+        print(f"Can't open or read file: {__target}")
+        print(f" -> Error: {ERO}\n")
+        traceback.print_exc()
+        
+        sys.exit(0)
+    
+    try:
+        __id = int(__fd_id)
+        
+    except Exception as ERO:
+        print(f"Can't convert to string f\"{__id}\" extracted from {__target}")
+        print(f" -> Error: {ERO}\n")
+        traceback.print_exc()
+        
+        sys.exit(0)
+
+    return id
