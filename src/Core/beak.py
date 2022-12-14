@@ -9,6 +9,8 @@ from Types import (
 
 from Data.permission import Permission
 
+from Core.Errors.errors import BeakErrors
+
 class Beak:
     __T_module: Tuple[str] = (
         "__main__",
@@ -67,8 +69,25 @@ class Beak:
     )
 
 
+    @classmethod
+    def __callable_cell__(cls) -> Dict[str, Tuple[str]]:
+        __kv = {
+            "Callable": tuple([ __km for __km in cls.__callable__ ]),
+            "Decorator_Callable": tuple([ __km for __km in cls.__decorater_callable__ ])
+        }
+        
+        return __kv
+
+
+    @classmethod
+    def __throwable_cell__(cls) -> Tuple[str]:
+        return tuple([ __km for __km in cls.__throwable__ ])
+
+
     def __init__(self, __N_module: str, **kwargs) -> None:
         if __N_module in self.__T_module:
             Permission.allocate(**kwargs)
         else:
-            raise 
+            raise BeakErrors.UnAuthorizedModuleException(__N_module)
+
+    

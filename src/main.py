@@ -9,17 +9,63 @@ from discord import Intents
 from discord.ext import commands
 from discord.ext.commands.context import Context
 
-from Data.Cache.settings import PREFIX as pf
+from Data.Cache.settings import PREFIX
+from Data.permission import Permission
+from Data.pool import AllocatedPool
 
+from Core.beak import Beak
+
+from Tools.Utils import printer
 
 intents = Intents.default()
 intents.members = True
 intents.message_content = True
 
 bot = commands.Bot(
-    command_prefix=pf.__getitem__(0),
+    command_prefix=PREFIX.__getitem__(0),
     intents=Intents.all()
 )
+
+beak: Beak
+
+
+def booting(info: dict):
+    from Core.Errors.errors import BeakErrors
+
+    print("=" * 80 + f"\nBooting Beak...")
+
+    try:
+        global beak
+
+        beak = Beak(__name__, **info)
+        fmsg = f"(id: {info.get('__id__')}, name: {info.get('__name__')})"
+
+        print(f"Allocated beak {fmsg}")
+
+    except BeakErrors.UnAuthorizedModuleException as ERO:
+        printer.print_ERO(ERO)
+        
+        sys.exit(0)
+
+
+def registring():
+    from Data.Errors.exceptions import PermissionExceptions
+
+    print(f"----- On permission beak now -----")
+
+    try:
+        Permission.register()
+
+        print(f"Permission granted ({Permission.get_admin_id()})")
+
+    except (
+        PermissionExceptions.ReRegistrationException, 
+        PermissionExceptions.RequiredAllocationException
+    ) as ERO:
+        # TODO: Handling exception
+        printer.print_ERO(ERO)
+
+        sys.exit(0)
 
 
 @bot.event
@@ -31,15 +77,14 @@ async def on_ready():
         "__id__": bot.user.id,
         "__name__": bot.user.name
     }
-
-    fmsg = f"(id: {_info.get('__id__')}, name: {_info.get('__name__')})"
-
-
-    print("=" * 80 + f"\nBooting Beak...")
-    print(f"Allocation beak {fmsg}")
-
     
+    booting(_info)
+    registring()
+
+    AllocatedPool()
     
+
+
 
 
 
