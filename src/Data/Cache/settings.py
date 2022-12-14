@@ -4,12 +4,14 @@ from typing import (
 
 PREFIX: Tuple[str] = ("#", "/>")
 
-FFMPEG_OPTION: Dict[str] = {
+
+FFMPEG_OPTION: Dict[str, str] = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 
     'options': '-vn'
 }
 
-YTDL_OPTION: Dict[str] = {
+
+YTDL_OPTION: Dict[str, str] = {
     'outtmpl': '%(title)s.%(uploader)s',
     "format": "bestaudio/best"
 }

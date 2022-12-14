@@ -35,14 +35,20 @@ async def on_ready():
     fmsg = f"(id: {_info.get('__id__')}, name: {_info.get('__name__')})"
 
 
-    print("=" * 80 + f"\Booting Beak...")
+    print("=" * 80 + f"\nBooting Beak...")
     print(f"Allocation beak {fmsg}")
+
+    
+    
+
 
 
 if __name__ == "__main__":
     from Tools.Extractor.file_extractor import read_token
 
-    token: str = read_token()
+    __token: str = read_token()
 
-    if token:
-        pass
+    if __token:
+        bot.run(__token)
+    else:
+        sys.exit(0)
