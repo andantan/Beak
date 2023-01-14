@@ -12,7 +12,7 @@ from discord.ext.commands.context import Context
 from Admin.Private.manager import Manager
 from Admin.DSC.debugger import Debugger
 
-from Tools.Notices.notice import CommandNotification, AdminNotification
+from Tools.Functions.function import CommandNotification, AdminNotification
 
 from Core.Cache.storage import Storage
 from Core.beak import Beak

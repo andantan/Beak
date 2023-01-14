@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, Union, Optional
+from typing import Dict, List, Tuple, Union, Optional, NewType, Callable, Coroutine, TypeVar
 
 from discord import Embed, ButtonStyle
 from discord.ui import View, Button
@@ -23,6 +23,196 @@ from Data.Paraments.settings import (
     ATTACHED_PLAYLIST_EMBED_COLOR,
     ENDED_PLAYLIST_NOTICE_COLOR
 )
+
+
+A = TypeVar("A")                # Arguments type
+R = TypeVar("R")                # return type
+
+stat = Union[int, bool]
+Function = Callable[[A], R]
+O_all = Union[bool, str, int, Function, None]
+
+BtnStat = NewType("BtnStat", Dict[str, O_all[Interaction, Coroutine]])
+BtnAttr = NewType("BtnAttr", Dict[stat, BtnStat])
+
+
+
+class CallbackInspector(Block.Instanctiating):
+    @staticmethod
+    def coro_interaction_inspection():
+        def _decof(func):
+            async def wrapper(*args, **kwargs):
+                interaction: Interaction
+
+                if "interaction" in kwargs.keys():
+                    interaction = kwargs.get("interaction")
+
+                else:
+                    interaction = args.__getitem__(0)
+                
+                if InteractionExtractor.is_user_joined_voice_channel(interaction):
+                    if InteractionExtractor.is_beak_joined_voice_channel(interaction):
+                        if InteractionExtractor.is_beak_and_user_same_voice_channel(interaction):
+                            await func(*args, **kwargs)
+
+                        else:
+                            await BeakNotification.Error.notice_not_same_channel(metadata=interaction)
+                    
+                    else:
+                        await BeakNotification.Error.notice_beak_not_entered_channel(metadata=interaction)
+                
+                else:
+                    await BeakNotification.Error.notice_author_not_entered_channel(metadata=interaction)
+
+            return wrapper
+        return _decof
+
+
+
+class Callback(Block.Instanctiating):
+    class Button(Block.Instanctiating):
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_skip(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_queue_two_or_more or guild_player.is_loop_mode:
+                if guild_player.is_connected:
+                    if guild_player.is_repeat_mode:
+                        guild_player.forced_skip()
+                        
+                    else:
+                        guild_player.skip()
+
+                    await interaction.response.defer()
+                    await BeakNotification.Playlist.deploy(player=guild_player)
+
+            else:
+                BeakNotification.Error.notice_last_audio(metadata=interaction)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_prev(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if not guild_player.is_overqueue_empty:
+                if guild_player.is_connected:
+                    guild_player.prev()
+
+                    await interaction.response.defer()
+                    await BeakNotification.Playlist.deploy(player=guild_player)
+
+            else:
+                await BeakNotification.Error.notice_first_audio(metadata=interaction)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_loop(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                guild_player.change_loop_mode()
+
+                await interaction.response.defer()
+                await BeakNotification.Playlist.deploy(player=guild_player)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_haevy_playlist(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                await interaction.response.defer()
+                await BeakNotification.Playlist.notice_playlist(metadata=interaction, player=guild_player)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_loop(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                guild_player.change_loop_mode()
+
+                await interaction.response.defer()
+                await BeakNotification.Playlist.deploy(player=guild_player)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_shuffle(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_queue_single and guild_player.is_overqueue_empty:
+                await BeakNotification.Playlist.notice_impossible_shuffling(metadata=interaction)
+            
+            else:
+                if guild_player.is_connected:
+                    try:
+                        guild_player.shuffle()
+
+                        await interaction.response.defer()
+                        await BeakNotification.Playlist.deploy(player=guild_player)
+
+                    except AsyncQueueErrors.QueueSaturatedErorr:
+                        # TODO: Handling this section
+                        pass
+          
+        
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_remove(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_queue_two_or_more:
+                if guild_player.is_connected:
+                    try:
+                        guild_player.remove()
+
+                        await interaction.response.defer()
+                        await BeakNotification.Playlist.deploy(player=guild_player)
+                    
+                    except IndexError:
+                        #TODO: Handling this section
+                        pass
+
+            else:
+                await BeakNotification.Error.notice_last_audio(metadata=interaction)     
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_pause(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if not guild_player.is_paused:
+                if guild_player.is_connected:
+                    guild_player.pause()
+
+                    await interaction.response.defer()
+                    await BeakNotification.Playlist.deploy(player=guild_player)
+
+            else:
+                BeakNotification.Error.notice_already_playing(metadata=interaction)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_replay(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if not guild_player.is_playing:
+                if guild_player.is_connected:
+                    guild_player.resume()
+
+                    await interaction.response.defer()
+                    await BeakNotification.Playlist.deploy(player=guild_player)
+
+            else:
+                await BeakNotification.Error.notice_already_paused(metadata=interaction)
 
 
 
@@ -332,27 +522,22 @@ class BeakNotification(Block.Instanctiating):
             def get_player_view(player: Player) -> View:
                 _view = View(timeout=None)
 
-                if player.is_paused:
+                buttons = Generator.Button.get_buttons(player=player)
+
+                for element in buttons:
                     button = Button(
-                        label = "▶️",
-                        style = ButtonStyle.secondary
+                        label = element.get("label"),
+                        style = element.get("style"),
+                        disabled = element.get("disabled"),
+                        row = element.get("row")
                     )
 
-                    button.callback = Callback.Button.callback_replay
+                    button.callback = element.get("callback")
 
                     _view.add_item(button)
 
                 else:
-                    button = Button(
-                        label = "⏸️",
-                        style = ButtonStyle.secondary
-                    )
-
-                    button.callback = Callback.Button.callback_pause
-
-                    _view.add_item(button)
-
-                return _view
+                    return _view
 
 
 
@@ -426,181 +611,119 @@ class BeakNotification(Block.Instanctiating):
             
             await BeakNotification.Playlist.notice_player_discarded_embed(ctx=ctx)
 
-            
 
-class CallbackInspector(Block.Instanctiating):
-    @staticmethod
-    def coro_interaction_inspection():
-        def _decof(func):
-            async def wrapper(*args, **kwargs):
-                interaction: Interaction
-
-                if "interaction" in kwargs.keys():
-                    interaction = kwargs.get("interaction")
-
-                else:
-                    interaction = args.__getitem__(0)
-                
-                if InteractionExtractor.is_user_joined_voice_channel(interaction):
-                    if InteractionExtractor.is_beak_joined_voice_channel(interaction):
-                        if InteractionExtractor.is_beak_and_user_same_voice_channel(interaction):
-                            await func(*args, **kwargs)
-
-                        else:
-                            await BeakNotification.Error.notice_not_same_channel(metadata=interaction)
-                    
-                    else:
-                        await BeakNotification.Error.notice_beak_not_entered_channel(metadata=interaction)
-                
-                else:
-                    await BeakNotification.Error.notice_author_not_entered_channel(metadata=interaction)
-
-            return wrapper
-        return _decof
-
-
-
-class Callback(Block.Instanctiating):
+class Generator(Block.Instanctiating):
     class Button(Block.Instanctiating):
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_skip(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+        # 셔플 이전 일정 다음 반복
+        # 아무 삭제 플리 초기 퇴장
 
-            if guild_player.is_queue_two_or_more or guild_player.is_loop_mode:
-                if guild_player.is_connected:
-                    if guild_player.is_repeat_mode:
-                        guild_player.forced_skip()
-                        
-                    else:
-                        guild_player.skip()
+        shuffle_btn: BtnAttr = {
+            True: {
+                "label": "🔀",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_shuffle,
+                "row": 0
+            },
+            False: {
+                "label": "🔀",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_shuffle,
+                "row": 0
+            }
+        }
 
-                    await interaction.response.defer()
-                    await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
+        # Associated with is_first_audio
+        prev_btn: BtnAttr = {
+            True: {
+                "label": "⏮️",
+                "style": ButtonStyle.secondary,
+                "disabled": True,
+                "callback": None,
+                "row": 0
+            },
+            False: {
+                "label": "⏮️",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_prev,
+                "row": 0
+            }
+        }
 
-            else:
-                BeakNotification.Error.notice_last_audio(metadata=interaction)
+        # Associated with is_paused
+        pause_and_play_btn: BtnAttr = {
+            True: {
+                "label": "▶️",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_replay,
+                "row": 0
+            },
+            False: {
+                "label": "⏸️",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_pause,
+                "row": 0
+            }
+        }  
 
+        # Associated with is_last_audio
+        skip_btn: BtnAttr = {
+            True: {
+                "label": "⏭️",
+                "style": ButtonStyle.secondary,
+                "disabled": True,
+                "callback": None,
+                "row": 0
+            },
+            False: {
+                "label": "⏭️",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_skip,
+                "row": 0
+            }
+        }
 
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_prev(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+        # Assoicated with loop_mode
+        loop_btn: BtnAttr = {
+            0: {
+                "label": "➡️",      # Linear playing mode
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_loop,
+                "row": 0
+            },
+            1: {
+                "label": "🔁",      # Loop playing mode
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_loop,
+                "row": 0
+            },
+            2: {
+                "label": "🔂",      # Repeat playing mode
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_loop,
+                "row": 0
+            }
+        }
 
-            if not guild_player.is_overqueue_empty:
-                if guild_player.is_connected:
-                    guild_player.prev()
-
-                    await interaction.response.defer()
-                    await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
-
-            else:
-                await BeakNotification.Error.notice_first_audio(metadata=interaction)
-
-
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_loop(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-            if guild_player.is_connected:
-                guild_player.change_loop_mode()
-
-                await interaction.response.defer()
-                await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
-
-
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_haevy_playlist(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-            if guild_player.is_connected:
-                await interaction.response.defer()
-                await BeakNotification.Playlist.notice_playlist(metadata=interaction, player=guild_player)
-
-
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_loop(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-            if guild_player.is_connected:
-                guild_player.change_loop_mode()
-
-                await interaction.response.defer()
-                await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
-
-
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_shuffle(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-            if guild_player.is_queue_single and guild_player.is_overqueue_empty:
-                await BeakNotification.Playlist.notice_impossible_shuffling(metadata=interaction)
-            
-            else:
-                if guild_player.is_connected:
-                    try:
-                        guild_player.shuffle()
-
-                        await interaction.response.defer()
-                        await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
-
-                    except AsyncQueueErrors.QueueSaturatedErorr:
-                        # TODO: Handling this section
-                        pass
-          
         
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_remove(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+        @classmethod
+        def get_buttons(cls, player: Player) -> Tuple[BtnStat]:
+            buttons: List[BtnStat] = list()
 
-            if guild_player.is_queue_two_or_more:
-                if guild_player.is_connected:
-                    try:
-                        guild_player.remove()
+            buttons.append(cls.shuffle_btn.get(True))
+            buttons.append(cls.prev_btn.get(player.is_first_audio))
+            buttons.append(cls.pause_and_play_btn.get(player.is_paused))
+            buttons.append(cls.skip_btn.get(player.is_last_audio))
+            buttons.append(cls.loop_btn.get(player.loop_mode))
 
-                        await interaction.response.defer()
-                        await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
-                    
-                    except IndexError:
-                        #TODO: Handling this section
-                        pass
+            return tuple(buttons)
+ 
 
-            else:
-                await BeakNotification.Error.notice_last_audio(metadata=interaction)     
-
-
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_pause(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-            if not guild_player.is_paused:
-                if guild_player.is_connected:
-                    guild_player.pause()
-
-                    await interaction.response.defer()
-                    await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
-
-            else:
-                BeakNotification.Error.notice_already_playing(metadata=interaction)
-
-
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_replay(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-            if not guild_player.is_playing:
-                if guild_player.is_connected:
-                    guild_player.resume()
-
-                    await interaction.response.defer()
-                    await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
-
-            else:
-                await BeakNotification.Error.notice_already_paused(metadata=interaction)

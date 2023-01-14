@@ -5,7 +5,7 @@ from Utils.extractor import ContextExtractor, InteractionExtractor
 
 from Class.superclass import Block
 
-from Tools.Notices.notice import BeakNotification
+from Tools.Functions.function import BeakNotification
 
 
 class BeakInspector(Block.Instanctiating):

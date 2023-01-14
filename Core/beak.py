@@ -20,7 +20,7 @@ from Core.Cache.Queue.Errors.queue_error import AsyncQueueErrors
 from Core.Errors.beak_error import BeakErrors
 
 # from Tools.Decorators.decorator import BeakInspector
-from Tools.Notices.notice import BeakNotification
+from Tools.Functions.function import BeakNotification
 
 from Utils.extractor import (
     ContextExtractor,

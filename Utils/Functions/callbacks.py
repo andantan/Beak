@@ -6,7 +6,7 @@ from Core.Cache.pool import PlayerPool
 from Core.Cache.player import Player
 from Core.Cache.Queue.queue import AsyncQueue
 
-from Tools.Notices.notice import BeakNotification
+from Tools.Functions.function import BeakNotification
 
 from Utils.extractor import InteractionExtractor
 
