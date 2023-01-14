@@ -9,6 +9,7 @@ from Class.superclass import Block
 
 from Core.Cache.pool import PlayerPool
 from Core.Cache.player import Player
+from Core.Cache.Queue.Errors.queue_error import AsyncQueueErrors
 
 # from Tools.Decorators.decorator import BeakInspector
 from Utils.extractor import InteractionExtractor
@@ -386,20 +387,24 @@ class BeakNotification(Block.Instanctiating):
         
 
         @staticmethod
-        async def notice_impossible_shuffling(ctx: Context) -> None:
+        async def notice_impossible_shuffling(metadata: Union[Context, Interaction]) -> None:
             values = {
                 "title" : "추가된 음원이나 재생된 음원이 없습니다.",
                 "color" : NOTICE_EMBED_COLOR
             }
 
-            await BeakNotification.Default.notice_default_embed(ctx=ctx, **values)
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
 
 
         @staticmethod
-        async def notice_playlist(ctx: Context, player: Player):
+        async def notice_playlist(metadata: Union[Context, Interaction], player: Player):
             _embed = BeakNotification.Playlist.PlaylistEmbedGenerator.get_playlist_embed(player=player)
 
-            await ctx.send(embed=_embed, delete_after=DEFAULT_DELAY)
+            if isinstance(metadata, Context):
+                await metadata.send(embed=_embed, delete_after=DEFAULT_DELAY)
+
+            elif isinstance(metadata, Interaction):
+                await metadata.response.send_message(embed=_embed, delete_after=DEFAULT_DELAY)
 
 
         @staticmethod
@@ -459,6 +464,118 @@ class Callback(Block.Instanctiating):
     class Button(Block.Instanctiating):
         @staticmethod
         @CallbackInspector.coro_interaction_inspection()
+        async def callback_skip(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_queue_two_or_more or guild_player.is_loop_mode:
+                if guild_player.is_connected:
+                    if guild_player.is_repeat_mode:
+                        guild_player.forced_skip()
+                        
+                    else:
+                        guild_player.skip()
+
+                    await interaction.response.defer()
+                    await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
+
+            else:
+                BeakNotification.Error.notice_last_audio(metadata=interaction)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_prev(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if not guild_player.is_overqueue_empty:
+                if guild_player.is_connected:
+                    guild_player.prev()
+
+                    await interaction.response.defer()
+                    await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
+
+            else:
+                await BeakNotification.Error.notice_first_audio(metadata=interaction)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_loop(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                guild_player.change_loop_mode()
+
+                await interaction.response.defer()
+                await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_haevy_playlist(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                await interaction.response.defer()
+                await BeakNotification.Playlist.notice_playlist(metadata=interaction, player=guild_player)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_loop(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                guild_player.change_loop_mode()
+
+                await interaction.response.defer()
+                await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_shuffle(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_queue_single and guild_player.is_overqueue_empty:
+                await BeakNotification.Playlist.notice_impossible_shuffling(metadata=interaction)
+            
+            else:
+                if guild_player.is_connected:
+                    try:
+                        guild_player.shuffle()
+
+                        await interaction.response.defer()
+                        await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
+
+                    except AsyncQueueErrors.QueueSaturatedErorr:
+                        # TODO: Handling this section
+                        pass
+          
+        
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_remove(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_queue_two_or_more:
+                if guild_player.is_connected:
+                    try:
+                        guild_player.remove()
+
+                        await interaction.response.defer()
+                        await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
+                    
+                    except IndexError:
+                        #TODO: Handling this section
+                        pass
+
+            else:
+                await BeakNotification.Error.notice_last_audio(metadata=interaction)     
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
         async def callback_pause(interaction: Interaction) -> None:
             guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
 
@@ -467,7 +584,6 @@ class Callback(Block.Instanctiating):
                     guild_player.pause()
 
                     await interaction.response.defer()
-
                     await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
 
             else:
@@ -484,7 +600,6 @@ class Callback(Block.Instanctiating):
                     guild_player.resume()
 
                     await interaction.response.defer()
-
                     await BeakNotification.Playlist.deploy(player=guild_player, interaction=interaction)
 
             else:

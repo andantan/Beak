@@ -315,7 +315,7 @@ class Beak(metaclass=Singleton):
         guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
 
         if guild_player.is_connected:
-            await BeakNotification.Playlist.notice_playlist(ctx=ctx, player=guild_player)
+            await BeakNotification.Playlist.notice_playlist(metadata=ctx, player=guild_player)
 
 
     @Inspector.coro_commander_inspection()
@@ -354,27 +354,3 @@ class Beak(metaclass=Singleton):
 
         else:
             await BeakNotification.Error.notice_last_audio(ctx=ctx)     
-
-
-    @staticmethod
-    async def beak_button_test(ctx: Context) -> None: 
-        view = View()
-
-        button = Button(
-            label="🐼", 
-            style=ButtonStyle.gray,
-        )
-        
-        button.callback = Beak.get_infomation
-        
-        view.add_item(button)
-
-        await ctx.send(content="Hello", view=view)
-
-
-    @staticmethod
-    async def get_infomation(interaction: Interaction):
-        guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-        
-        await interaction.response.send_message(f"playing: {guild_player.is_playing}")
-    
