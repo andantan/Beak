@@ -11,7 +11,7 @@ from discord.ext.commands.context import Context
 
 from Admin.Private.manager import Manager
 
-from Tools.Functions.function import CommandNotification
+from Tools.Functions.function import CommandNotification, AdminNotification
 
 from Core.Cache.storage import Storage
 from Core.beak import Beak
@@ -57,7 +57,7 @@ async def on_command_error(ctx: Context, e: Exception):
 
 
 
-@bot.command(aliases=commands_config.get("bplay"))
+@bot.command(aliases=["play", "p", "재생"])
 async def bplay(ctx: Context, URL: str) -> None:
     await ctx.message.delete()
 
@@ -66,7 +66,7 @@ async def bplay(ctx: Context, URL: str) -> None:
 
     else:
         await CommandNotification.Error.notice_unvalid_url(ctx=ctx)
-        
+
 
 # deprecated 2023-01-14 v2.0.0-alpha released
 #
@@ -134,15 +134,14 @@ async def bplay(ctx: Context, URL: str) -> None:
 #
 #
 #
-# @bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
-# async def execute_DSC(ctx: Context, *args, **kwargs):
-#     raise NotImplementedError
-#
-    # if Storage.Identification().is_admin(ctx.author.id):
-    #     ...
+@bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
+async def execute_DSC(ctx: Context, *args):
+    if Storage.Identification().is_admin(ctx.author.id):
+        if args.__getitem__(0) == "-n" or args.__getitem__(0) == "--notice":
+            await ctx.send(f"{args[1]}")
 
-    # else:
-    #     await AdminNotification.Admin.notice_not_authorized_user(ctx=ctx)
+    else:
+        await AdminNotification.Admin.notice_not_authorized_user(ctx=ctx)
 
 
 def main():

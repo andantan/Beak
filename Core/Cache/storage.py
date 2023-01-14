@@ -53,8 +53,8 @@ class Storage(Block.Instanctiating):
             return self.administrator_identifications
 
         
-        @property
-        def is_admin(self, identification: int) -> bool: return identification in self.administrator_identifications
+        def is_admin(self, identification: int) -> bool: 
+            return identification in self.administrator_identifications
 
         
         def set_beak_id(self, beak_identification: int) -> None:
