@@ -78,11 +78,7 @@ class Callback(Block.Instanctiating):
 
             if guild_player.is_queue_two_or_more or guild_player.is_loop_mode:
                 if guild_player.is_connected:
-                    if guild_player.is_repeat_mode:
-                        guild_player.forced_skip()
-                        
-                    else:
-                        guild_player.skip()
+                    guild_player.skip(forced=guild_player.is_repeat_mode)
 
                     await interaction.response.defer()
                     await BeakNotification.Playlist.deploy(player=guild_player)
@@ -98,7 +94,7 @@ class Callback(Block.Instanctiating):
 
             if not guild_player.is_overqueue_empty:
                 if guild_player.is_connected:
-                    guild_player.prev()
+                    guild_player.prev(forced=guild_player.is_repeat_mode)
 
                     await interaction.response.defer()
                     await BeakNotification.Playlist.deploy(player=guild_player)
@@ -548,7 +544,7 @@ class BeakNotification(Block.Instanctiating):
                 "color" : NOTICE_EMBED_COLOR
             }
 
-            await BeakNotification.Default.notice_default_embed(ctx=ctx, **values)
+            await BeakNotification.Default.notice_default_embed(metadata=ctx, **values)
 
 
         @staticmethod
@@ -558,7 +554,7 @@ class BeakNotification(Block.Instanctiating):
                 "color" : ENDED_PLAYLIST_NOTICE_COLOR
             }
 
-            await BeakNotification.Default.notice_default_embed(ctx=ctx, **values)
+            await BeakNotification.Default.notice_default_embed(metadata=ctx, **values)
 
 
         @staticmethod
@@ -568,7 +564,7 @@ class BeakNotification(Block.Instanctiating):
                 "color" : ENDED_PLAYLIST_NOTICE_COLOR
             }
 
-            await BeakNotification.Default.notice_default_embed(ctx=ctx, **values)
+            await BeakNotification.Default.notice_default_embed(metadata=ctx, **values)
         
 
         @staticmethod

@@ -144,22 +144,33 @@ class Player:
         self.VOICECLIENT.stop()
 
 
-    def prev(self) -> None:
+    def prev(self, forced: bool=False) -> None:
         DUMMY = { "title": None }
 
         self.QUEUE.insert(0, self.OVERQUEUE.pop())
         self.QUEUE.insert(0, DUMMY)
 
+        if forced:
+            self.dequeue()
+
         self.VOICECLIENT.stop()
 
+    
+    def forced_prev(self) -> None:
+        self.prev(forced=True)
 
-    def skip(self) -> None:
+
+    def skip(self, forced: bool=False) -> None:
+        if forced:
+            self.dequeue()
+
         self.VOICECLIENT.stop()
 
     
     def forced_skip(self) -> None:
-        self.dequeue()
-        self.skip()
+        # self.dequeue()
+        # self.skip()
+        self.skip(forced=True)
 
     
     def pause(self) -> None:
