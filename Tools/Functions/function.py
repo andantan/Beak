@@ -1,6 +1,8 @@
 import datetime
 from typing import Dict, List, Tuple, Union, Optional, NewType, Callable, Coroutine, TypeVar
 
+import discord
+
 from discord import Embed, ButtonStyle
 from discord.ui import View, Button
 from discord.ext.commands.context import Context, Interaction
@@ -11,10 +13,8 @@ from Core.Cache.pool import PlayerPool
 from Core.Cache.player import Player
 from Core.Cache.Queue.Errors.queue_error import AsyncQueueErrors
 
-# from Tools.Decorators.decorator import BeakInspector
 from Utils.extractor import InteractionExtractor
 
-# from Utils.Functions.callbacks import Callback
 
 from Data.Paraments.settings import (
     DEFAULT_DELAY, 
@@ -633,7 +633,11 @@ class BeakNotification(Block.Instanctiating):
             _view = BeakNotification.Playlist.PlaylistViewGenerator.get_player_view(player=player)
 
             if player.is_message_saved:
-                player.message = await player.message.edit(embed=_embed, view=_view)
+                try:
+                    player.message = await player.message.edit(embed=_embed, view=_view)
+                
+                except discord.errors.NotFound:
+                    pass
 
             else:
                 player.message = await ctx.send(embed=_embed, view=_view)
