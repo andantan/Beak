@@ -3,6 +3,7 @@ from typing import (
 )
 
 import asyncio
+import discord
 
 from discord import Embed, FFmpegPCMAudio, ButtonStyle
 from discord.ui import View, Button
@@ -141,7 +142,7 @@ class Beak(metaclass=Singleton):
         if guild_player.is_connected:
             await guild_player.voice_client.disconnect()
         
-        await BeakNotification.Playlist.discard(ctx=ctx, player=guild_player)
+        await BeakNotification.Playlist.discard(metadata=ctx, player=guild_player)
 
         self.__discard_pool__(guild_id=guild_id)
 
@@ -206,7 +207,13 @@ class Beak(metaclass=Singleton):
         while not guild_player.is_queue_empty:
             audio_source_url = guild_player.seek_queue.get("audio_url")
             
-            guild_player.voice_client.play(FFmpegPCMAudio(audio_source_url))
+            try:
+                guild_player.voice_client.play(FFmpegPCMAudio(audio_source_url))
+            
+            except discord.errors.ClientException:
+                await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx)
+
+                return
 
             await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 

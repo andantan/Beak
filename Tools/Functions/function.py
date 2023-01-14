@@ -121,8 +121,8 @@ class Callback(Block.Instanctiating):
             guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
 
             if guild_player.is_connected:
-                await interaction.response.defer()
                 await BeakNotification.Playlist.notice_playlist(metadata=interaction, player=guild_player)
+                # await interaction.response.defer()
 
 
         @staticmethod
@@ -166,9 +166,11 @@ class Callback(Block.Instanctiating):
             if guild_player.is_queue_two_or_more:
                 if guild_player.is_connected:
                     try:
+                        removed_audio_title = guild_player.seek_next_queue.get("title")
+
                         guild_player.remove()
 
-                        await interaction.response.defer()
+                        await BeakNotification.Playlist.notice_removed(metadata=interaction, title=removed_audio_title)
                         await BeakNotification.Playlist.deploy(player=guild_player)
                     
                     except IndexError:
@@ -209,6 +211,32 @@ class Callback(Block.Instanctiating):
 
             else:
                 await BeakNotification.Error.notice_already_paused(metadata=interaction)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_exit(interaction: Interaction) -> None:
+            guild_id = InteractionExtractor.get_guild_id(interaction)
+            guild_player: Player = PlayerPool().get(guild_id)
+
+            if guild_player.is_connected:
+                await guild_player.voice_client.disconnect()
+
+                PlayerPool().__delitem__(guild_id)
+                
+                await BeakNotification.Playlist.discard(metadata=interaction, player=guild_player)
+
+        
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_reset(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                await BeakNotification.Playlist.deploy(player=guild_player)
+
+                await interaction.response.defer()
+
 
 
 
@@ -276,16 +304,16 @@ class AdminNotification(Block.Instanctiating):
 class BeakNotification(Block.Instanctiating):
     class Default(Block.Instanctiating):
         @staticmethod
-        async def notice_default_embed(metadata: Union[Context, Interaction], **kwargs) -> None:
+        async def notice_default_embed(metadata: Union[Context, Interaction], delay: int=DEFAULT_DELAY,**kwargs) -> None:
             _embed = Embed(**kwargs)
 
             _embed.set_footer(text="Beak by Qbean")
 
             if isinstance(metadata, Context):
-                await metadata.send(embed=_embed, delete_after=DEFAULT_DELAY)
+                await metadata.send(embed=_embed, delete_after=delay)
             
             elif isinstance(metadata, Interaction):
-                await metadata.response.send_message(embed=_embed, delete_after=DEFAULT_DELAY)
+                await metadata.response.send_message(embed=_embed, delete_after=delay)
 
 
 
@@ -538,13 +566,13 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_player_discarded_embed(ctx: Context):
+        async def notice_player_discarded_embed(metadata: Union[Context, Interaction]):
             values = {
                 "title" : "플레이어가 종료되었습니다.",
                 "color" : NOTICE_EMBED_COLOR
             }
 
-            await BeakNotification.Default.notice_default_embed(metadata=ctx, **values)
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
 
 
         @staticmethod
@@ -565,6 +593,17 @@ class BeakNotification(Block.Instanctiating):
             }
 
             await BeakNotification.Default.notice_default_embed(metadata=ctx, **values)
+
+
+        @staticmethod
+        async def notice_removed(metadata: Union[Context, Interaction], title: str):
+            values = {
+                "title" : "음원 삭제가 완료되었습니다.",
+                "description": f"삭제된 음원: {title}",
+                "color" : ENDED_PLAYLIST_NOTICE_COLOR
+            }
+
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, delay=3, **values)
         
 
         @staticmethod
@@ -601,17 +640,17 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def discard(ctx: Context, player: Player) -> None:
+        async def discard(metadata: Union[Context, Interaction], player: Player) -> None:
             if player.is_message_saved:
                 await player.message.delete()
             
-            await BeakNotification.Playlist.notice_player_discarded_embed(ctx=ctx)
+            await BeakNotification.Playlist.notice_player_discarded_embed(metadata=metadata)
 
 
 class Generator(Block.Instanctiating):
     class Button(Block.Instanctiating):
         # 셔플 이전 일정 다음 반복
-        # 아무 삭제 플리 초기 퇴장
+        # 아무 삭제 플리 퇴장 초기
 
         shuffle_btn: BtnAttr = {
             True: {
@@ -709,7 +748,93 @@ class Generator(Block.Instanctiating):
             }
         }
 
-        
+        reset_btn: BtnAttr = {
+            True: {
+                "label": "🧐",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_reset,
+                "row": 1
+            },
+            False: {
+                "label": "🧐",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_reset,
+                "row": 1
+            }
+        }
+
+        remove_btn: BtnAttr = {
+            True: {
+                "label": "🗑️",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_remove,
+                "row": 1
+            },
+            False: {
+                "label": "🗑️",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_remove,
+                "row": 1
+            }
+        }
+
+        playlist_btn: BtnAttr = {
+            True: {
+                "label": "📜",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_haevy_playlist,
+                "row": 1
+            },
+            False: {
+                "label": "📜",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_haevy_playlist,
+                "row": 1
+            }
+        }        
+
+        exit_btn: BtnAttr = {
+            True: {
+                "label": "⏹️",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_exit,
+                "row": 1
+            },
+            False: {
+                "label": "⏹️",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_exit,
+                "row": 1
+            }
+        }
+
+        # Notimplemented
+        notImplemented_reset_btn: BtnAttr = {
+            True: {
+                "label": "✖️",
+                "style": ButtonStyle.secondary,
+                "disabled": True,
+                "callback": None,
+                "row": 1
+            },
+            False: {
+                "label": "✖️",
+                "style": ButtonStyle.secondary,
+                "disabled": True,
+                "callback": None,
+                "row": 1
+            }
+        }
+
+
         @classmethod
         def get_buttons(cls, player: Player) -> Tuple[BtnStat]:
             buttons: List[BtnStat] = list()
@@ -719,6 +844,11 @@ class Generator(Block.Instanctiating):
             buttons.append(cls.pause_and_play_btn.get(player.is_paused))
             buttons.append(cls.skip_btn.get(player.is_last_audio))
             buttons.append(cls.loop_btn.get(player.loop_mode))
+            buttons.append(cls.reset_btn.get(True))
+            buttons.append(cls.remove_btn.get(True))
+            buttons.append(cls.playlist_btn.get(True))
+            buttons.append(cls.exit_btn.get(True))
+            buttons.append(cls.notImplemented_reset_btn.get(True)) 
 
             return tuple(buttons)
  

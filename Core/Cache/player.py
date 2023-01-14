@@ -98,6 +98,8 @@ class Player:
     @property
     def seek_overqueue(self) -> Optional[Dict[str, str]]: return self.OVERQUEUE.seek()
     @property
+    def seek_next_queue(self) -> Optional[Dict[str, str]]: return self.QUEUE.reference().__getitem__(1)
+    @property
     def reference_queue(self) -> Tuple[Dict[str, str]]: return self.QUEUE.reference()
     @property
     def reference_overqueue(self) -> Tuple[Dict[str, str]]: return self.OVERQUEUE.reference()
