@@ -10,9 +10,8 @@ from discord.ext import commands
 from discord.ext.commands.context import Context
 
 from Admin.Private.manager import Manager
-from Admin.DSC.debugger import Debugger
 
-from Tools.Functions.function import CommandNotification, AdminNotification
+from Tools.Functions.function import CommandNotification
 
 from Core.Cache.storage import Storage
 from Core.beak import Beak
@@ -48,30 +47,13 @@ async def on_ready():
     Storage.Identification().set_admin_ids(administrator_identifications)
 
 
-# @bot.event
-# async def on_command_error(ctx: Context, e: Exception):
-    
-#     if isinstance(e, discord_command_errors.MissingRequiredArgument):
-#         command_name: str = ctx.command.name
+@bot.event
+async def on_command_error(ctx: Context, e: Exception):
+    if isinstance(e, commands.errors.MissingRequiredArgument):
+        command_name: str = ctx.command.name
 
-#         if command_name.__eq__("bplay"):
-#             await CommandNotification.Error.notice_missing_required_arguments(ctx=ctx)
-
-
-# @bot.event
-# async def on_button_click(interaction: Interaction):
-#     await interaction.response.send_message("Hi")
-
-
-
-
-
-@bot.command(aliases=["btn"])
-async def btntest(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await Beak.beak_button_test(ctx=ctx)
-
+        if command_name.__eq__("bplay"):
+            await CommandNotification.Error.notice_missing_required_arguments(ctx=ctx)
 
 
 
@@ -84,76 +66,78 @@ async def bplay(ctx: Context, URL: str) -> None:
 
     else:
         await CommandNotification.Error.notice_unvalid_url(ctx=ctx)
+        
 
-
-@bot.command(aliases=commands_config.get("bskip"))
-async def bskip(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_skip(ctx=ctx)
-
-
-@bot.command(aliases=commands_config.get("bprev"))
-async def bprev(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_prev(ctx=ctx)
-
-
-@bot.command(aliases=commands_config.get("bpause"))
-async def bpause(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_pause(ctx=ctx)
-
-
-@bot.command(aliases=commands_config.get("breplay"))
-async def breplay(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_replay(ctx=ctx)
-
-
-@bot.command(aliases=commands_config.get("bloop"))
-async def bloop(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_loop(ctx=ctx)
-
-
-@bot.command(aliases=commands_config.get("blist"))
-async def blist(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_heavy_playlist(ctx=ctx)
-
-
-@bot.command(aliases=commands_config.get("bshuffle"))
-async def bshuffle(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_shuffle(ctx=ctx)
-
-
-@bot.command(aliases=commands_config.get("bremove"))
-async def bremove(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_remove(ctx=ctx)
-
-
-@bot.command(aliases=commands_config.get("bexit"))
-async def bexit(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_exit(ctx=ctx)
-
-
-
-@bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
-async def execute_DSC(ctx: Context, *args, **kwargs):
-    raise NotImplementedError
-
+# deprecated 2023-01-14 v2.0.0-alpha released
+#
+# @bot.command(aliases=commands_config.get("bskip"))
+# async def bskip(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_skip(ctx=ctx)
+#
+#
+# @bot.command(aliases=commands_config.get("bprev"))
+# async def bprev(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_prev(ctx=ctx)
+#
+#
+# @bot.command(aliases=commands_config.get("bpause"))
+# async def bpause(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_pause(ctx=ctx)
+#
+#
+# @bot.command(aliases=commands_config.get("breplay"))
+# async def breplay(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_replay(ctx=ctx)
+#
+#
+# @bot.command(aliases=commands_config.get("bloop"))
+# async def bloop(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_loop(ctx=ctx)
+#
+#
+# @bot.command(aliases=commands_config.get("blist"))
+# async def blist(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_heavy_playlist(ctx=ctx)
+#
+#
+# @bot.command(aliases=commands_config.get("bshuffle"))
+# async def bshuffle(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_shuffle(ctx=ctx)
+#
+#
+# @bot.command(aliases=commands_config.get("bremove"))
+# async def bremove(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_remove(ctx=ctx)
+#
+#
+# @bot.command(aliases=commands_config.get("bexit"))
+# async def bexit(ctx: Context) -> None:
+#     await ctx.message.delete()
+#
+#     await beak.beak_exit(ctx=ctx)
+#
+#
+#
+# @bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
+# async def execute_DSC(ctx: Context, *args, **kwargs):
+#     raise NotImplementedError
+#
     # if Storage.Identification().is_admin(ctx.author.id):
     #     ...
 
