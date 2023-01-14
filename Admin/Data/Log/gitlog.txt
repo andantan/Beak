@@ -1,0 +1,46 @@
+dc5055672707de66abf15676ef10c89658ce2e65 Beak Extractor bug has been fixed - v1.0.13-alpha
+ffde03330138e2b1872b7f8faf26617cfdd2f887 Beak allocation & ContextExtractor bug fixed v.1.0.12.02-alpha
+bde2952ac626bd4322b619abf86ee534c8eccdfc Beak main.py added command play v.1.0.12-alpha
+0c2f38327177df2dab8184adc1758e2d26c84c63 Beak REfactored v1.0.11.03-alpha
+89e87a4ef28978bf9dde52a692816f40060eb3f6 Beak Refactored v1.0.11.03-alpha
+5d0f48963d034f05949b1c5a2477c52d80d8b232 Beak Refactored Player v1.0.11.02-alpha
+db41d266e46439e6321826515d124b7e5621e3f9 Beak depreacted Status & Queue implemented - v1.0.11-alpha
+a69fd12b0d63ff17f95a0f3850036e7c440cfb5c Beak preparing to implement Queue - v1.0.10.02-alpha
+2338081ee32ba8571d86f4bfd222da8240f7403c Beak extract has been default implemented - v1.0.10-alpha
+8ea976c25ca6e02cfcc61b4e924cbc52c51d2760 Beak enter has been implemented - v1.0.9.02-allpha
+4f61fb0b1783becb4fc6ec50f14736e1490f9655 Beak play has been default implemeted - v1.0.9-alpha
+710a047c15bd258d83d72e99a3995433b4752f12 BeakInspector decorator default implemented - v1.0.8-alpha
+d325bfa53a09168d51f6c41a1442f865aead9826 ContextExtractor Debugger has been prettier implemented - v1.0.7.03-alpha
+dab29679d92d8eeb954fe9713fe3bbbff399d988 ContextExtractor Debugger has been implemented - v1.0.7.2-alpha
+da7545d91b8d51916eed1167f950b62a1bd32be3 ContextExtractor has been implemented - v1.0.7-alpha
+afb766a7826fe98eb304f3876818a7881428f62f Type change List to Tuple - for NotAllowingDealing
+3fb08bf653ce26ca437ac52dfd47cd2bd83ee175 Logging message compact configured
+c9c7b7aad78b08901e3be20e96cf0078b5c676d7 Ignoring .gitignore
+c510cc41b11cdf48041af8aa448f439522edee94 alphaing
+a629a16e4ba90b18ed269f17383fa83c603e5de9 commit branching
+ea7699ebfaa8b165f25f6575479b881c5b8650c5 .gitignore working branch | final step
+372baa5a2b39aef8dd101167d0f90d10ec5eb52f .gitignore working branch
+925c464ae6dd20240702668c4e34c434b7aa8173 .gitignore working branch
+c8f423d2fd2d0992a25900f375677ab22068dca2 .gitignore working branch
+05f9092f824a047f8b68a55a54ec57b887b9f2a9 .gitignore working branch
+8820aac525463676a542e77792afb9a6eee9f84b Update configuration.json
+22c886c116519977dd889d5cb76df7aae056b761 Update administrator.json
+3483ed1f88f0c7a76b556d31540c8dc0a702d245 Update administrator.json
+e3b8eca42cc52f355aa167ff79e53c09e94f892f .gitignore configuration added
+1e6b83f5d75627a758300c0c35dfa9b23aa895b1 VC_status default implemetned - v.1.0.6.02-alpha
+a9c7e57124d6aecda47aec5be0a7d339c6a40929 PL_status default implemented - v.1.0.6.01-alpha
+11fdef8b03c2d75986d42211e52f6f14ef4a81bc user.json deprecated - v.1.0.5.02-alpha
+e7ee7a6fd61170ba07eca7631f26a6a42990be9e on_command_error default version updated - v.1.0.5-alpha
+51eb7e18a99c3e76eca9fadba69461138f7e403f v1.0.4.02-alpha
+090b5428bc5aca3b7580cd193b35b24cbbaceb52 v1.0.4.01-alpha
+9efeebd7e2280d76f63ec996cf5ca98f48822e3b v1.0.4-alpha
+a293c6c35dd73a0274a65d48a5b29ccb61a7ac41 v1.0.3-alpha
+ef21081190bc99dd729c5cd9b72a3597269418ca Server hosting experiment v1.0.2.05-alpha
+b1af4edbcd7b4319e014c75ccd268877ce9715e4 Server hosting experiment v1.0.2.04-alpha
+e303f7a063226bbb89acc330ee51db5a466b6cde Server hosting experiment v1.0.2.03-alpha
+8ce6659ec305c4bfdd92bc4fd9c97d71b710b6a7 Server hosting experiment v1.0.2.02-alpha
+547c00539e282889f36de2a4f8cea29f543f5a6f Server hosting experiment v1.0.2.01-alpha
+3165aa5dce72e9d6c6c93e57f8c477d5e5cfbb17 Server hosting experiment v1.0.2-alpha
+6fa64646845673137aa66e4effef7fda8983e2f6 Server hosting experiment v1.0.1-alpha
+eef2d15bc5d1f771526d783844cd25ca0ce3dd69 Server hosting experiment v1.0.0-alpha
+1458a06dbe0a02aed6d8fcf6ef532bc9d706ba47 Init discord-bot-clone
