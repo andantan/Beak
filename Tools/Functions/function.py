@@ -588,8 +588,8 @@ class BeakNotification(Block.Instanctiating):
 
                 for index, audio in enumerate(guild_overqueue):
                     option = SelectOption(
-                        label = f"{index + 1} - {audio.get('title')}",
-                        description = f"{audio.get('uploader')}",
+                        label = f"{index + 1} - {audio.get('title')[:100]}",
+                        description = f"{audio.get('uploader')[:100]}",
                         value = f"{index}"
                     )
 
@@ -622,8 +622,8 @@ class BeakNotification(Block.Instanctiating):
 
                 for index, audio in enumerate(guild_queue):
                     option = SelectOption(
-                        label = f"{index + 1} - {audio.get('title')}",
-                        description = f"{audio.get('uploader')}",
+                        label = f"{index + 1} - {audio.get('title')[:100]}",
+                        description = f"{audio.get('uploader')[:100]}",
                         value = f"{index + 1}"
                     )
 
