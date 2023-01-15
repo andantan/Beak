@@ -5,7 +5,8 @@ from typing import Optional
 import discord
 import validators
 
-from discord import Intents
+from discord import Intents, SelectOption
+from discord.ui import Select
 from discord.ext import commands
 from discord.ext.commands.context import Context
 
@@ -69,13 +70,12 @@ async def bplay(ctx: Context, URL: str) -> None:
         await CommandNotification.Error.notice_unvalid_url(ctx=ctx)
 
 
-@bot.command(aliases=["skip"])
-async def bskip(ctx: Context) -> None:
+
+@bot.command(aliases=["select"])
+async def bselect(ctx: Context) -> None:
     await ctx.message.delete()
 
-    await beak.beak_skip(ctx=ctx)
-
-
+    await beak.beak_select(ctx=ctx)
 
 
 @bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])

@@ -5,8 +5,8 @@ from typing import (
 import asyncio
 import discord
 
-from discord import Embed, FFmpegPCMAudio, ButtonStyle
-from discord.ui import View, Button
+from discord import Embed, FFmpegPCMAudio, SelectOption
+from discord.ui import Select, View
 from discord.voice_client import VoiceClient
 from discord.ext.commands.context import Context, Message, Interaction
 
@@ -361,3 +361,25 @@ class Beak(metaclass=Singleton):
 
         else:
             await BeakNotification.Error.notice_last_audio(ctx=ctx)     
+
+
+    async def beak_select(self, ctx: Context) -> None:
+        menu = Select(
+            placeholder = "Holder",
+            options = [
+                SelectOption(label="1", description="first", value="A"),
+                SelectOption(label="2", description="second", value="B"),
+                SelectOption(label="3", description="third", value="C")
+            ]
+        )
+
+        async def callbacks(interaction):
+            await interaction.response.send_message(f"{menu.values.__getitem__(0)}")
+
+        menu.callback = callbacks
+        
+        _view = View()
+
+        _view.add_item(menu)
+
+        await ctx.send(view=_view)
