@@ -3,8 +3,8 @@ from typing import Dict, List, Tuple, Union, Optional, NewType, Callable, Corout
 
 import discord
 
-from discord import Embed, ButtonStyle
-from discord.ui import View, Button
+from discord import Embed, ButtonStyle, SelectOption
+from discord.ui import View, Button, Select
 from discord.ext.commands.context import Context, Interaction
 
 from Class.superclass import Block
@@ -122,7 +122,6 @@ class Callback(Block.Instanctiating):
 
             if guild_player.is_connected:
                 await BeakNotification.Playlist.notice_playlist(metadata=interaction, player=guild_player)
-                # await interaction.response.defer()
 
 
         @staticmethod
@@ -236,6 +235,31 @@ class Callback(Block.Instanctiating):
                 await BeakNotification.Playlist.deploy(player=guild_player)
 
                 await interaction.response.defer()
+
+
+    class SelectMenu(Block.Instanctiating):
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_force_play(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                index = int(interaction.data.get("values").__getitem__(0))
+                
+                guild_player.forced_play(value=index, forced=guild_player.is_repeat_mode)
+
+                await BeakNotification.Playlist.notice_forced_play(metadata=interaction, player=guild_player)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_defer(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                await interaction.response.defer()
+                
+
 
 
 
@@ -545,6 +569,36 @@ class BeakNotification(Block.Instanctiating):
             @staticmethod
             def get_player_view(player: Player) -> View:
                 _view = View(timeout=None)
+                
+                options: List[SelectOption] = list()
+                
+                guild_queue: Tuple[Dict[str, str]] = player.reference_queue[1:]
+
+                for index, audio in enumerate(guild_queue):
+                    option = SelectOption(
+                        label = f"{index + 1} - {audio.get('title')}",
+                        description = f"{audio.get('uploader')}",
+                        value = f"{index + 1}"
+                    )
+
+                    options.append(option)
+
+                if options:
+                    menu = Select(
+                        placeholder = "재생할 음원을 선택해주세요.",
+                        options = options
+                    )
+
+                    menu.callback = Callback.SelectMenu.callback_force_play
+                else:
+                    menu = Select(
+                        placeholder = "마지막 음원입니다.",
+                        options = [ SelectOption(label="음원을 추가해주세요.") ]
+                    )
+
+                    menu.callback = Callback.SelectMenu.callback_defer
+
+                _view.add_item(menu)
 
                 buttons = Generator.Button.get_buttons(player=player)
 
@@ -553,15 +607,14 @@ class BeakNotification(Block.Instanctiating):
                         label = element.get("label"),
                         style = element.get("style"),
                         disabled = element.get("disabled"),
-                        row = element.get("row")
+                        row = element.get("row") + 1
                     )
 
                     button.callback = element.get("callback")
 
                     _view.add_item(button)
 
-                else:
-                    return _view
+                return _view
 
 
 
@@ -617,7 +670,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_playlist(metadata: Union[Context, Interaction], player: Player):
+        async def notice_playlist(metadata: Union[Context, Interaction], player: Player) -> None:
             _embed = BeakNotification.Playlist.PlaylistEmbedGenerator.get_playlist_embed(player=player)
 
             if isinstance(metadata, Context):
@@ -625,6 +678,18 @@ class BeakNotification(Block.Instanctiating):
 
             elif isinstance(metadata, Interaction):
                 await metadata.response.send_message(embed=_embed, delete_after=DEFAULT_DELAY)
+
+
+        @staticmethod
+        async def notice_forced_play(metadata: Union[Context, Interaction], player: Player) -> None:
+            values = {
+                "title" : f"{player.seek_next_queue.get('title')}을 먼저 재생합니다.",
+                "description": f"{player.seek_next_queue.get('uploader')}",
+                "color" : ATTACHED_PLAYLIST_EMBED_COLOR
+            }
+
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
+
 
 
         @staticmethod
@@ -858,3 +923,32 @@ class Generator(Block.Instanctiating):
             return tuple(buttons)
  
 
+    class SelectMenu(Block.Instanctiating):
+        @staticmethod
+        def get_select_options(player: Player) -> List[SelectOption]:
+            options: List[SelectOption] = list()
+
+            if player.is_queue_single:
+                return options
+            
+            guild_queue: Tuple[Dict[str, str]] = player.reference_queue[1:]
+
+            try:
+                for index, audio in enumerate(guild_queue):
+                    option = SelectOption(
+                        label = f"{index + 1} - {audio.get('title')}",
+                        description = f"{audio.get('uploader')}",
+                        value = f"{index + 1}"
+                    )
+
+                    options.append(option)
+
+            except ValueError:
+                pass
+
+            except Exception as e:
+                import traceback
+
+                print(e)
+                print(e.__doc__)
+                print(traceback.format_exc())
