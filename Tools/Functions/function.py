@@ -628,7 +628,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def deploy(player: Player, ctx: Optional[Context]=None, interaction: Optional[Interaction]=None) -> None:
+        async def deploy(player: Player, ctx: Optional[Context]=None) -> None:
             _embed = BeakNotification.Playlist.PlaylistEmbedGenerator.get_player_embed(player=player)
             _view = BeakNotification.Playlist.PlaylistViewGenerator.get_player_view(player=player)
 

@@ -1,8 +1,4 @@
-from typing import (
-    Dict, List, Optional
-)
-
-from multipledispatch import dispatch
+from typing import Dict
 
 from Class.superclass import Singleton
 
@@ -40,5 +36,9 @@ class PlayerPool(metaclass=Singleton):
     
     def get_guild_player(self, guild_id: int) -> Player:
         return self.__getitem__(guild_id=guild_id)
+
+
+    def reference_players(self) -> Dict[int, Player]:
+        return self.player_pool 
     
     
