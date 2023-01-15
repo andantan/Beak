@@ -120,7 +120,15 @@ class Player:
     @message.setter
     def message(self, message: Message) -> None: self.MESSAGESTORAGE.set_message(message=message)
     @property
-    def is_message_saved(self) -> bool: return self.MESSAGESTORAGE.is_saved()
+    def guild_id(self) -> int: return self.MESSAGESTORAGE.get_guild_id()
+    @property
+    def channel_id(self) -> Optional[int]: return self.MESSAGESTORAGE.get_channel_id()
+    @channel_id.setter
+    def channel_id(self, channel_id: int) -> None: self.MESSAGESTORAGE.set_channel_id(channel_id=channel_id)
+    @property
+    def is_message_saved(self) -> bool: return self.MESSAGESTORAGE.is_message_saved()
+    @property
+    def is_channel_id_saved(self) -> bool: return self.MESSAGESTORAGE.is_channel_id_saved()
 
 
     def enqueue(self, audios: List[Dict[str, str]]) -> None:

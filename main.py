@@ -10,6 +10,7 @@ from discord.ext import commands
 from discord.ext.commands.context import Context
 
 from Admin.Private.manager import Manager
+from Admin.DSC.debugger import Debugger
 
 from Tools.Functions.function import CommandNotification, AdminNotification
 
@@ -68,12 +69,32 @@ async def bplay(ctx: Context, URL: str) -> None:
         await CommandNotification.Error.notice_unvalid_url(ctx=ctx)
 
 
+@bot.command(aliases=["skip"])
+async def bskip(ctx: Context) -> None:
+    await ctx.message.delete()
+
+    await beak.beak_skip(ctx=ctx)
+
+
+
+
 @bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
 async def execute_DSC(ctx: Context, *args):
     if Storage.Identification().is_admin(ctx.author.id):
         if args.__getitem__(0) == "-n" or args.__getitem__(0) == "--notice":
-            await ctx.send(f"{args[1]}")
+            try:
+                channel = bot.get_channel(int(args.__getitem__(1)))
 
+                await channel.send(f"{args.__getitem__(2)}")
+
+            except Exception as e:
+                print(e)
+                print(e.__doc__)
+        
+        if args.__getitem__(0) == "-c" or args.__getitem__(0) == "--context-extractor":
+            Debugger.debug_context_extractor(ctx=ctx)
+
+        
     else:
         await AdminNotification.Admin.notice_not_authorized_user(ctx=ctx)
 

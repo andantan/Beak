@@ -92,7 +92,7 @@ class Beak(metaclass=Singleton):
 
         player = Player(
             voice_client = voice_client,
-            message_storage = Storage.Message(),
+            message_storage = Storage.Message(guild_id=guild_id),
             queue = AsyncQueue.Queue(),
             over_queue = AsyncQueue.OverQueue()
         )

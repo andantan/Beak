@@ -10,18 +10,31 @@ class Storage(Block.Instanctiating):
     class Message:
         __slots__ = (
             "message",
+            "guild_id",
+            "channel_id",
         )
 
-        def __init__(self) -> None:
+        def __init__(self, guild_id: int) -> None:
             self.message: Optional[Message] = None
+            self.channel: Optional[int] = None
+            self.guild_id: int = guild_id
 
         
-        def is_saved(self) -> bool:
+        def is_message_saved(self) -> bool:
             return self.message is not None
+
+
+        def is_guild_id_saved(self) -> bool:
+            return self.guild_id is not None
+
+
+        def is_channel_id_saved(self) -> bool:
+            return self.channel_id is not None
 
         
         def clear(self) -> None:
             self.message = None
+            self.channel_id = None
 
 
         def get_message(self) -> Optional[Message]:
@@ -30,7 +43,18 @@ class Storage(Block.Instanctiating):
 
         def set_message(self, message: Message) -> None:
             self.message = message
+
         
+        def get_guild_id(self) -> int:
+            return self.guild_id
+
+        
+        def get_channel_id(self) -> Optional[int]:
+            return self.channel_id
+
+
+        def set_channel_id(self, channel_id: int) -> None:
+            self.channel_id = channel_id       
 
 
     class Identification(metaclass=Singleton):

@@ -13,7 +13,7 @@ from Core.Cache.pool import PlayerPool
 from Core.Cache.player import Player
 from Core.Cache.Queue.Errors.queue_error import AsyncQueueErrors
 
-from Utils.extractor import InteractionExtractor
+from Utils.extractor import InteractionExtractor, ContextExtractor
 
 
 from Data.Paraments.settings import (
@@ -637,10 +637,11 @@ class BeakNotification(Block.Instanctiating):
                     player.message = await player.message.edit(embed=_embed, view=_view)
                 
                 except discord.errors.NotFound:
-                    pass
+                    player.message = await player.message.channel.send(embed=_embed, view=_view)
 
             else:
                 player.message = await ctx.send(embed=_embed, view=_view)
+                player.channel_id = int(ContextExtractor.get_channel_id(ctx=ctx))
 
 
         @staticmethod
