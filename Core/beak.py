@@ -250,117 +250,119 @@ class Beak(metaclass=Singleton):
         else:
             await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx)
 
+    # deprecated 2023-01-15
+    # Beak v3.0.0-alpha released
+    # 
+    # @Inspector.coro_commander_inspection()
+    # async def beak_skip(self, ctx: Context) -> None:
+    #     guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
 
-    @Inspector.coro_commander_inspection()
-    async def beak_skip(self, ctx: Context) -> None:
-        guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
-
-        if guild_player.is_queue_two_or_more or guild_player.is_loop_mode:
-            if guild_player.is_connected:
-                if guild_player.is_repeat_mode:
-                    guild_player.forced_skip()
+    #     if guild_player.is_queue_two_or_more or guild_player.is_loop_mode:
+    #         if guild_player.is_connected:
+    #             if guild_player.is_repeat_mode:
+    #                 guild_player.forced_skip()
                     
-                else:
-                    guild_player.skip()
+    #             else:
+    #                 guild_player.skip()
 
-        else:
-            await BeakNotification.Error.notice_last_audio(ctx=ctx)
-
-
-    @Inspector.coro_commander_inspection()
-    async def beak_prev(self, ctx: Context) -> None:
-        guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
-
-        if not guild_player.is_overqueue_empty:
-            if guild_player.is_connected:
-                guild_player.prev()
-
-        else:
-            await BeakNotification.Error.notice_first_audio(ctx=ctx)
+    #     else:
+    #         await BeakNotification.Error.notice_last_audio(ctx=ctx)
 
 
-    @Inspector.coro_commander_inspection()
-    async def beak_pause(self, ctx: Context) -> None:
-        guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
+    # @Inspector.coro_commander_inspection()
+    # async def beak_prev(self, ctx: Context) -> None:
+    #     guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
 
-        if not guild_player.is_paused:
-            if guild_player.is_connected:
-                guild_player.pause()
+    #     if not guild_player.is_overqueue_empty:
+    #         if guild_player.is_connected:
+    #             guild_player.prev()
 
-                await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
+    #     else:
+    #         await BeakNotification.Error.notice_first_audio(ctx=ctx)
 
-        else:
-            await BeakNotification.Error.notice_already_paused(ctx=ctx)
+
+    # @Inspector.coro_commander_inspection()
+    # async def beak_pause(self, ctx: Context) -> None:
+    #     guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
+
+    #     if not guild_player.is_paused:
+    #         if guild_player.is_connected:
+    #             guild_player.pause()
+
+    #             await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
+
+    #     else:
+    #         await BeakNotification.Error.notice_already_paused(ctx=ctx)
 
         
-    @Inspector.coro_commander_inspection()
-    async def beak_replay(self, ctx: Context) -> None:
-        guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
+    # @Inspector.coro_commander_inspection()
+    # async def beak_replay(self, ctx: Context) -> None:
+    #     guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
 
-        if not guild_player.is_playing:
-            if guild_player.is_connected:
-                guild_player.resume()
+    #     if not guild_player.is_playing:
+    #         if guild_player.is_connected:
+    #             guild_player.resume()
 
-                await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
+    #             await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
-        else:
-            await BeakNotification.Error.notice_already_playing(ctx=ctx)
+    #     else:
+    #         await BeakNotification.Error.notice_already_playing(ctx=ctx)
 
 
-    @Inspector.coro_commander_inspection()
-    async def beak_loop(self, ctx: Context) -> None:
-        guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
+    # @Inspector.coro_commander_inspection()
+    # async def beak_loop(self, ctx: Context) -> None:
+    #     guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
 
-        if guild_player.is_connected:
-            guild_player.change_loop_mode()
+    #     if guild_player.is_connected:
+    #         guild_player.change_loop_mode()
 
-            await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
+    #         await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
             
 
-    @Inspector.coro_commander_inspection()
-    async def beak_heavy_playlist(self, ctx: Context) -> None:
-        guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
+    # @Inspector.coro_commander_inspection()
+    # async def beak_heavy_playlist(self, ctx: Context) -> None:
+    #     guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
 
-        if guild_player.is_connected:
-            await BeakNotification.Playlist.notice_playlist(metadata=ctx, player=guild_player)
+    #     if guild_player.is_connected:
+    #         await BeakNotification.Playlist.notice_playlist(metadata=ctx, player=guild_player)
 
 
-    @Inspector.coro_commander_inspection()
-    async def beak_shuffle(self, ctx: Context) -> None:
-        guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
+    # @Inspector.coro_commander_inspection()
+    # async def beak_shuffle(self, ctx: Context) -> None:
+    #     guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
 
-        if guild_player.is_queue_single and guild_player.is_overqueue_empty:
-            await BeakNotification.Playlist.notice_impossible_shuffling(ctx=ctx)
+    #     if guild_player.is_queue_single and guild_player.is_overqueue_empty:
+    #         await BeakNotification.Playlist.notice_impossible_shuffling(ctx=ctx)
         
-        else:
-            if guild_player.is_connected:
-                try:
-                    guild_player.shuffle()
+    #     else:
+    #         if guild_player.is_connected:
+    #             try:
+    #                 guild_player.shuffle()
 
-                    await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
+    #                 await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
-                except AsyncQueueErrors.QueueSaturatedErorr:
-                    # TODO: Handling this section
-                    pass
+    #             except AsyncQueueErrors.QueueSaturatedErorr:
+    #                 # TODO: Handling this section
+    #                 pass
 
                     
-    @Inspector.coro_commander_inspection()
-    async def beak_remove(self, ctx: Context) -> None:
-        guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
+    # @Inspector.coro_commander_inspection()
+    # async def beak_remove(self, ctx: Context) -> None:
+    #     guild_player = self.__get_guild_player(ContextExtractor.get_guild_id(ctx))
 
-        if guild_player.is_queue_two_or_more:
-            if guild_player.is_connected:
-                try:
-                    guild_player.remove()
+    #     if guild_player.is_queue_two_or_more:
+    #         if guild_player.is_connected:
+    #             try:
+    #                 guild_player.remove()
 
-                    await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
+    #                 await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
                 
-                except IndexError:
-                    #TODO: Handling this section
-                    pass
+    #             except IndexError:
+    #                 #TODO: Handling this section
+    #                 pass
 
-        else:
-            await BeakNotification.Error.notice_last_audio(ctx=ctx)     
+    #     else:
+    #         await BeakNotification.Error.notice_last_audio(ctx=ctx)     
 
 
     async def beak_select(self, ctx: Context) -> None:
@@ -377,7 +379,7 @@ class Beak(metaclass=Singleton):
             await interaction.response.send_message(f"{menu.values.__getitem__(0)}")
 
         menu.callback = callbacks
-        
+
         _view = View()
 
         _view.add_item(menu)
