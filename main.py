@@ -59,7 +59,7 @@ async def on_command_error(ctx: Context, e: Exception):
 
 
 
-@bot.command(aliases=["play", "p", "재생"])
+@bot.command(aliases=["play", "p", "P"])
 async def bplay(ctx: Context, URL: str) -> None:
     await ctx.message.delete()
 
