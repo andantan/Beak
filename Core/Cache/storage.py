@@ -16,7 +16,7 @@ class Storage(Block.Instanctiating):
 
         def __init__(self, guild_id: int) -> None:
             self.message: Optional[Message] = None
-            self.channel: Optional[int] = None
+            self.channel_id: Optional[int] = None
             self.guild_id: int = guild_id
 
         

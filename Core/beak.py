@@ -89,16 +89,16 @@ class Beak(metaclass=Singleton):
                 is_connected = player.is_connected,
                 is_activated = player.is_activated
             )
-
+        
         player = Player(
             voice_client = voice_client,
             message_storage = Storage.Message(guild_id=guild_id),
             queue = AsyncQueue.Queue(),
             over_queue = AsyncQueue.OverQueue()
         )
-
+        
         self.player_pool.__setitem__(guild_id, player)
-
+        
 
     def __discard_pool__(self, guild_id) -> None:
         self.player_pool.__delitem__(guild_id)
@@ -129,7 +129,7 @@ class Beak(metaclass=Singleton):
 
         try:
             self.__alloc_pool__(ctx=ctx, voice_client=voice_client)
-
+            
         except BeakErrors.AlreadyAllocatedGuildId as e:
             print(f"{e.__doc__}\n{e}\n")
 

@@ -21,7 +21,7 @@ class Manager(Block.Instanctiating):
             data = json_data.get(value)
 
         if logging:
-            print("\n\t" + f"{value}" + ": {\n")
+            print("{\n\t" + f"{value}" + ": {\n")
 
             for k, v in data.items():
                 print(f"\t\t\"{k}\": \"{v}\"")
