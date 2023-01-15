@@ -165,11 +165,6 @@ class Player:
 
         self.VOICECLIENT.stop()
 
-    # deprecated 2023-01-15
-    #     
-    # def forced_prev(self) -> None:
-    #     self.prev(forced=True)
-
 
     def skip(self, forced: bool=False) -> None:
         if forced:
@@ -177,19 +172,23 @@ class Player:
 
         self.VOICECLIENT.stop()
 
-    # deprecated 2023-01-15
-    #     
-    # def forced_skip(self) -> None:
-    #     # self.dequeue()
-    #     # self.skip()
-    #     self.skip(forced=True)
-
-
     def forced_play(self, value: int, forced: bool=False) -> None:
         if value > self.queue_length:
             raise ValueError
 
         self.QUEUE.insert(index=1, audio=self.QUEUE.pop(index=value))
+
+        if forced:
+            self.dequeue()
+
+        self.VOICECLIENT.stop()
+
+
+    def forced_prev(self, value: int, forced: bool=False) -> None:
+        if value > self.overqueue_length:
+            raise ValueError
+
+        self.QUEUE.insert(index=1, audio=self.OVERQUEUE.pop(index=value))
 
         if forced:
             self.dequeue()
@@ -211,8 +210,6 @@ class Player:
 
     def looping(self) -> None:
         overplayed_queue = list(self.OVERQUEUE.reference())
-        # now_playing_audio  = self.QUEUE.
-
         self.QUEUE.enqueue(overplayed_queue)
 
         self.OVERQUEUE.clear()

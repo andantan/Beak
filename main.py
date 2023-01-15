@@ -71,12 +71,6 @@ async def bplay(ctx: Context, URL: str) -> None:
 
 
 
-@bot.command(aliases=["select"])
-async def bselect(ctx: Context) -> None:
-    await ctx.message.delete()
-
-    await beak.beak_select(ctx=ctx)
-
 
 @bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
 async def execute_DSC(ctx: Context, *args):

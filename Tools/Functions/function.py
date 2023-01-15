@@ -253,15 +253,25 @@ class Callback(Block.Instanctiating):
 
         @staticmethod
         @CallbackInspector.coro_interaction_inspection()
+        async def callback_force_prev_play(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                index = int(interaction.data.get("values").__getitem__(0))
+                
+                guild_player.forced_prev(value=index, forced=guild_player.is_repeat_mode)
+
+                await BeakNotification.Playlist.notice_forced_play(metadata=interaction, player=guild_player)
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
         async def callback_defer(interaction: Interaction) -> None:
             guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
 
             if guild_player.is_connected:
                 await interaction.response.defer()
                 
-
-
-
 
 
 class CommandNotification(Block.Instanctiating):
@@ -570,7 +580,43 @@ class BeakNotification(Block.Instanctiating):
             def get_player_view(player: Player) -> View:
                 _view = View(timeout=None)
                 
-                options: List[SelectOption] = list()
+
+
+                overqueue_options: List[SelectOption] = list()
+                
+                guild_overqueue: Tuple[Dict[str, str]] = player.reference_overqueue
+
+                for index, audio in enumerate(guild_overqueue):
+                    option = SelectOption(
+                        label = f"{index + 1} - {audio.get('title')}",
+                        description = f"{audio.get('uploader')}",
+                        value = f"{index}"
+                    )
+
+                    overqueue_options.append(option)
+
+                if overqueue_options:
+                    overqueue_menu = Select(
+                        placeholder = "재생완료된 음원 중 재생할 음원을 선택해주세요.",
+                        options = overqueue_options,
+                        row = 0
+                    )
+
+                    overqueue_menu.callback = Callback.SelectMenu.callback_force_prev_play
+                else:
+                    overqueue_menu = Select(
+                        placeholder = "첫번째 음원입니다.",
+                        options = [ SelectOption(label="재생완료된 음원이 존재하지 않습니다.") ],
+                        row = 0
+                    )
+
+                    overqueue_menu.callback = Callback.SelectMenu.callback_defer
+
+                _view.add_item(overqueue_menu)
+
+
+
+                queue_options: List[SelectOption] = list()
                 
                 guild_queue: Tuple[Dict[str, str]] = player.reference_queue[1:]
 
@@ -581,24 +627,28 @@ class BeakNotification(Block.Instanctiating):
                         value = f"{index + 1}"
                     )
 
-                    options.append(option)
+                    queue_options.append(option)
 
-                if options:
-                    menu = Select(
-                        placeholder = "재생할 음원을 선택해주세요.",
-                        options = options
+                if queue_options:
+                    queue_menu = Select(
+                        placeholder = "대기 중인 음원 중 재생할 음원을 선택해주세요.",
+                        options = queue_options,
+                        row = 1
                     )
 
-                    menu.callback = Callback.SelectMenu.callback_force_play
+                    queue_menu.callback = Callback.SelectMenu.callback_force_play
                 else:
-                    menu = Select(
+                    queue_menu = Select(
                         placeholder = "마지막 음원입니다.",
-                        options = [ SelectOption(label="음원을 추가해주세요.") ]
+                        options = [ SelectOption(label="음원을 추가해주세요.") ],
+                        row = 1
                     )
 
-                    menu.callback = Callback.SelectMenu.callback_defer
+                    queue_menu.callback = Callback.SelectMenu.callback_defer
 
-                _view.add_item(menu)
+                _view.add_item(queue_menu)
+
+
 
                 buttons = Generator.Button.get_buttons(player=player)
 
@@ -607,7 +657,7 @@ class BeakNotification(Block.Instanctiating):
                         label = element.get("label"),
                         style = element.get("style"),
                         disabled = element.get("disabled"),
-                        row = element.get("row") + 1
+                        row = element.get("row") + 2
                     )
 
                     button.callback = element.get("callback")
