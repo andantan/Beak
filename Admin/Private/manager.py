@@ -58,7 +58,7 @@ class Manager(Block.Instanctiating):
 
 
         if logging:
-            print("{\n\tadministrators: [")
+            print("{\n\tadministrators: {")
 
             for index, _identification in enumerate(administrator_identifications):
                 print(f"\t\t\"Admin-{index + 1}\": \"{_identification}\"")
