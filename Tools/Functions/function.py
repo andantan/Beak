@@ -588,6 +588,9 @@ class BeakNotification(Block.Instanctiating):
                 guild_overqueue: Tuple[Dict[str, str]] = player.reference_overqueue
 
                 for index, audio in enumerate(guild_overqueue):
+                    if index == 10:
+                        break
+
                     option = SelectOption(
                         label = f"{index + 1} - {audio.get('title')[:100]}",
                         description = f"{audio.get('uploader')[:100]}",
@@ -622,6 +625,9 @@ class BeakNotification(Block.Instanctiating):
                 guild_queue: Tuple[Dict[str, str]] = player.reference_queue[1:]
 
                 for index, audio in enumerate(guild_queue):
+                    if index == 10:
+                        break
+                    
                     option = SelectOption(
                         label = f"{index + 1} - {audio.get('title')[:100]}",
                         description = f"{audio.get('uploader')[:100]}",

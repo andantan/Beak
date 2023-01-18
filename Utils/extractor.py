@@ -50,7 +50,6 @@ class YoutubeDlExtractor(Block.Instanctiating):
                 "audio_url": extracted_data.get("url"),
                 "duration": extracted_data.get("duration"),
                 "thumbnail": extracted_data.get("thumbnail")
-                
             }
             
             return summrized_audio_info

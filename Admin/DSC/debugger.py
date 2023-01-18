@@ -63,7 +63,17 @@ class Debugger(Block.Instanctiating):
                 print(ERO)
 
         else:
-            pprint(YoutubeDlExtractor.summarize(debugging_data, URL), indent=4)
+            data = YoutubeDlExtractor.summarize(debugging_data, URL)
+            # pprint(data, indent=4)
+            
+            for i in data:
+                try:
+                    print(type(i) == dict)
+                
+                except Exception as e :
+                    print(i)
+                    print(e)
+                    print(e.__doc__)
 
     
     @staticmethod

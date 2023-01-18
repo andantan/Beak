@@ -70,6 +70,12 @@ async def bplay(ctx: Context, URL: str) -> None:
         await CommandNotification.Error.notice_unvalid_url(ctx=ctx)
 
 
+@bot.command(aliases=["extract"])
+async def bextract(ctx: Context, url: str) -> None:
+    await ctx.message.delete()
+
+    await Debugger.debug_youtube_dl_extractor(URL=url)
+
 
 
 @bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
