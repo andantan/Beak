@@ -172,28 +172,36 @@ class Player:
 
         self.VOICECLIENT.stop()
 
-    def forced_play(self, value: int, forced: bool=False) -> None:
+    def forced_play(self, value: int, forced: bool=False) -> Dict[str, str]:
         if value > self.queue_length:
             raise ValueError
 
-        self.QUEUE.insert(index=1, audio=self.QUEUE.pop(index=value))
+        selected_audio = self.QUEUE.pop(index=value)
+
+        self.QUEUE.insert(index=1, audio=selected_audio)
 
         if forced:
             self.dequeue()
 
         self.VOICECLIENT.stop()
 
+        return selected_audio
 
-    def forced_prev(self, value: int, forced: bool=False) -> None:
+
+    def forced_prev(self, value: int, forced: bool=False) -> Dict[str, str]:
         if value > self.overqueue_length:
             raise ValueError
 
-        self.QUEUE.insert(index=1, audio=self.OVERQUEUE.pop(index=value))
+        selected_audio = self.OVERQUEUE.pop(index=value)
+
+        self.QUEUE.insert(index=1, audio=selected_audio)
 
         if forced:
             self.dequeue()
 
         self.VOICECLIENT.stop()
+
+        return selected_audio
 
     
     def pause(self) -> None:

@@ -1,4 +1,5 @@
 import datetime
+import asyncio
 from typing import Dict, List, Tuple, Union, Optional, NewType, Callable, Coroutine, TypeVar
 
 import discord
@@ -245,10 +246,10 @@ class Callback(Block.Instanctiating):
 
             if guild_player.is_connected:
                 index = int(interaction.data.get("values").__getitem__(0))
-                
-                guild_player.forced_play(value=index, forced=guild_player.is_repeat_mode)
 
-                await BeakNotification.Playlist.notice_forced_play(metadata=interaction, player=guild_player)
+                selected_audio = guild_player.forced_play(value=index, forced=guild_player.is_repeat_mode)
+
+                await BeakNotification.Playlist.notice_forced_play(metadata=interaction, audio=selected_audio)
 
 
         @staticmethod
@@ -258,10 +259,10 @@ class Callback(Block.Instanctiating):
 
             if guild_player.is_connected:
                 index = int(interaction.data.get("values").__getitem__(0))
-                
-                guild_player.forced_prev(value=index, forced=guild_player.is_repeat_mode)
 
-                await BeakNotification.Playlist.notice_forced_play(metadata=interaction, player=guild_player)
+                selected_audio = guild_player.forced_prev(value=index, forced=guild_player.is_repeat_mode)
+
+                await BeakNotification.Playlist.notice_forced_play(metadata=interaction, audio=selected_audio)
 
 
         @staticmethod
@@ -731,12 +732,14 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_forced_play(metadata: Union[Context, Interaction], player: Player) -> None:
+        async def notice_forced_play(metadata: Union[Context, Interaction], audio: Dict[str, str]) -> None:
             values = {
-                "title" : f"{player.seek_next_queue.get('title')}을 먼저 재생합니다.",
-                "description": f"{player.seek_next_queue.get('uploader')}",
+                "title" : f"{audio.get('title')}을 먼저 재생합니다.",
+                "description": f"{audio.get('uploader')}",
                 "color" : ATTACHED_PLAYLIST_EMBED_COLOR
             }
+
+            # await asyncio.sleep(1)
 
             await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
 
@@ -755,8 +758,13 @@ class BeakNotification(Block.Instanctiating):
                     player.message = await player.message.channel.send(embed=_embed, view=_view)
 
             else:
-                player.message = await ctx.send(embed=_embed, view=_view)
-                player.channel_id = int(ContextExtractor.get_channel_id(ctx=ctx))
+                try:
+                    player.message = await ctx.send(embed=_embed, view=_view)
+                    player.channel_id = int(ContextExtractor.get_channel_id(ctx=ctx))
+
+                except Exception as e:
+                    print(e)
+                    print(e.__doc__)
 
 
         @staticmethod
