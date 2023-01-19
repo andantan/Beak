@@ -247,3 +247,10 @@ class Player:
         
         except IndexError as throwable:
             raise throwable
+
+
+    def reset(self) -> None:
+        self.QUEUE.clear()
+        self.OVERQUEUE.clear()
+
+

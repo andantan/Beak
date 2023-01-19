@@ -124,9 +124,12 @@ class AsyncQueue(Block.Instanctiating):
             self.playlist.insert(index, audio)
 
 
-        def clear(self) -> None:
+        def clear(self, on_air: bool=True) -> None:
             if not self.is_empty():
-                self.playlist = self.playlist[:1]
+                if on_air:
+                    self.playlist = self.playlist[:1]
+                else:
+                    self.playlist = list()
 
 
         def remove(self, index: int=1) -> None:

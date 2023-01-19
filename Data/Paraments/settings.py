@@ -16,6 +16,11 @@ YTDL_OPTION: Dict[str, str] = {
     "format": "bestaudio/best"
 }
 
+FFMPEG_OPTION = {
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 
+    'options': '-vn'
+}
+
 
 DEFAULT_DELAY = 15
 SLEEP_TIME = 2

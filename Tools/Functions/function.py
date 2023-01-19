@@ -229,13 +229,26 @@ class Callback(Block.Instanctiating):
         
         @staticmethod
         @CallbackInspector.coro_interaction_inspection()
-        async def callback_reset(interaction: Interaction) -> None:
+        async def callback_refresh(interaction: Interaction) -> None:
             guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
 
             if guild_player.is_connected:
                 await BeakNotification.Playlist.deploy(player=guild_player)
 
                 await interaction.response.defer()
+
+
+        @staticmethod
+        @CallbackInspector.coro_interaction_inspection()
+        async def callback_reset(interaction: Interaction) -> None:
+            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+            if guild_player.is_connected:
+                guild_player.reset()
+
+                await BeakNotification.Playlist.deploy(player=guild_player)
+                await BeakNotification.Playlist.notice_reset_playlist(metadata=interaction, player=guild_player)
+
 
 
     class SelectMenu(Block.Instanctiating):
@@ -588,7 +601,7 @@ class BeakNotification(Block.Instanctiating):
                 guild_overqueue: Tuple[Dict[str, str]] = player.reference_overqueue
 
                 for index, audio in enumerate(guild_overqueue):
-                    if index == 10:
+                    if index == 25:
                         break
 
                     option = SelectOption(
@@ -625,9 +638,9 @@ class BeakNotification(Block.Instanctiating):
                 guild_queue: Tuple[Dict[str, str]] = player.reference_queue[1:]
 
                 for index, audio in enumerate(guild_queue):
-                    if index == 10:
+                    if index == 25:
                         break
-                    
+
                     option = SelectOption(
                         label = f"{index + 1} - {audio.get('title')[:100]}",
                         description = f"{audio.get('uploader')[:100]}",
@@ -745,7 +758,15 @@ class BeakNotification(Block.Instanctiating):
                 "color" : ATTACHED_PLAYLIST_EMBED_COLOR
             }
 
-            # await asyncio.sleep(1)
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
+
+
+        @staticmethod
+        async def notice_reset_playlist(metadata: Union[Context, Interaction], player: Player) -> None:
+            values = {
+                "title" : "플레이리스트가 초기화되었습니다.",
+                "color" : ATTACHED_PLAYLIST_EMBED_COLOR
+            }
 
             await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
 
@@ -882,19 +903,19 @@ class Generator(Block.Instanctiating):
             }
         }
 
-        reset_btn: BtnAttr = {
+        refresh_btn: BtnAttr = {
             True: {
-                "label": "🧐",
+                "label": "🛠️",
                 "style": ButtonStyle.secondary,
                 "disabled": False,
-                "callback": Callback.Button.callback_reset,
+                "callback": Callback.Button.callback_refresh,
                 "row": 1
             },
             False: {
-                "label": "🧐",
+                "label": "🛠️",
                 "style": ButtonStyle.secondary,
                 "disabled": False,
-                "callback": Callback.Button.callback_reset,
+                "callback": Callback.Button.callback_refresh,
                 "row": 1
             }
         }
@@ -950,20 +971,20 @@ class Generator(Block.Instanctiating):
             }
         }
 
-        # Notimplemented
-        notImplemented_reset_btn: BtnAttr = {
+        
+        reset_btn: BtnAttr = {
             True: {
-                "label": "✖️",
+                "label": "🔄️",
                 "style": ButtonStyle.secondary,
-                "disabled": True,
-                "callback": None,
+                "disabled": False,
+                "callback": Callback.Button.callback_reset,
                 "row": 1
             },
             False: {
-                "label": "✖️",
+                "label": "🔄️",
                 "style": ButtonStyle.secondary,
-                "disabled": True,
-                "callback": None,
+                "disabled": False,
+                "callback": Callback.Button.callback_reset,
                 "row": 1
             }
         }
@@ -978,11 +999,12 @@ class Generator(Block.Instanctiating):
             buttons.append(cls.pause_and_play_btn.get(player.is_paused))
             buttons.append(cls.skip_btn.get(player.is_last_audio))
             buttons.append(cls.loop_btn.get(player.loop_mode))
+            
             buttons.append(cls.reset_btn.get(True))
             buttons.append(cls.remove_btn.get(True))
             buttons.append(cls.playlist_btn.get(True))
             buttons.append(cls.exit_btn.get(True))
-            buttons.append(cls.notImplemented_reset_btn.get(True)) 
+            buttons.append(cls.refresh_btn.get(True))
 
             return tuple(buttons)
  

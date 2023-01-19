@@ -30,7 +30,8 @@ from Utils.extractor import (
 from Data.Paraments.settings import (
     PLAYLIST_NOTICE_EMBED_COLOR, 
     DEFAULT_DELAY,
-    SLEEP_TIME
+    SLEEP_TIME,
+    FFMPEG_OPTION
 )
 
 
@@ -174,7 +175,10 @@ class Beak(metaclass=Singleton):
             audio_source_url = guild_player.seek_queue.get("audio_url")
             
             try:
-                guild_player.voice_client.play(FFmpegPCMAudio(audio_source_url))
+                guild_player.voice_client.play(
+                    FFmpegPCMAudio(audio_source_url),
+                    **FFMPEG_OPTION
+                )
             
             except discord.errors.ClientException:
                 await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx)
