@@ -54,7 +54,8 @@ class Beak(metaclass=Singleton):
             raise BeakErrors.AlreadyAllocatedGuildId(
                 guild_id = guild_id,
                 is_connected = player.is_connected,
-                is_activated = player.is_activated
+                is_activated = player.is_activated,
+                is_msg_saved = player.is_message_saved
             )
         
         player = Player(
@@ -175,11 +176,8 @@ class Beak(metaclass=Singleton):
             audio_source_url = guild_player.seek_queue.get("audio_url")
             
             try:
-                guild_player.voice_client.play(
-                    FFmpegPCMAudio(audio_source_url),
-                    **FFMPEG_OPTION
-                )
-            
+                guild_player.voice_client.play(FFmpegPCMAudio(audio_source_url, **FFMPEG_OPTION))
+        
             except discord.errors.ClientException:
                 await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx)
 
