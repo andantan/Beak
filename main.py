@@ -59,7 +59,7 @@ async def on_command_error(ctx: Context, e: Exception):
 
 
 
-@bot.command(aliases=["play", "p", "P"])
+@bot.command(aliases=["play", "p", "P", "재생", "제로"])
 async def bplay(ctx: Context, URL: str) -> None:
     await ctx.message.delete()
 
@@ -68,6 +68,7 @@ async def bplay(ctx: Context, URL: str) -> None:
 
     else:
         await CommandNotification.Error.notice_unvalid_url(ctx=ctx)
+
 
 
 @bot.command(aliases=["extract"])
