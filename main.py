@@ -43,7 +43,7 @@ async def on_ready():
     beak = Beak()
 
     await bot.change_presence(status=discord.Status.online)
-    await bot.change_presence(activity=discord.Game(name=f"{DEFAULT_COMMAND_PREFIX}명령어"))
+    await bot.change_presence(activity=discord.Game(name=f"{DEFAULT_COMMAND_PREFIX}p"))
 
     Storage.Identification().set_beak_id(bot.user.id)
     Storage.Identification().set_admin_ids(administrator_identifications)
