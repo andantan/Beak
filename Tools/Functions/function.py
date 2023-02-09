@@ -18,7 +18,8 @@ from Utils.extractor import InteractionExtractor, ContextExtractor
 
 
 from Data.Paraments.settings import (
-    DEFAULT_DELAY, 
+    DEFAULT_DELAY,
+    SELECT_MENU_THRESHOLD,
     COMMANDER_NOTICE_EMBED_COLOR,
     NOTICE_EMBED_COLOR,
     ATTACHED_PLAYLIST_EMBED_COLOR,
@@ -601,7 +602,7 @@ class BeakNotification(Block.Instanctiating):
                 guild_overqueue: Tuple[Dict[str, str]] = player.reference_overqueue
 
                 for index, audio in enumerate(guild_overqueue):
-                    if index == 25:
+                    if index == SELECT_MENU_THRESHOLD:
                         break
 
                     option = SelectOption(
@@ -638,7 +639,7 @@ class BeakNotification(Block.Instanctiating):
                 guild_queue: Tuple[Dict[str, str]] = player.reference_queue[1:]
 
                 for index, audio in enumerate(guild_queue):
-                    if index == 25:
+                    if index == SELECT_MENU_THRESHOLD:
                         break
 
                     option = SelectOption(
@@ -816,7 +817,7 @@ class BeakNotification(Block.Instanctiating):
 class Generator(Block.Instanctiating):
     class Button(Block.Instanctiating):
         # 셔플 이전 일정 다음 반복
-        # 아무 삭제 플리 퇴장 초기
+        # 초기화 삭제 플리 퇴장 초기
 
         shuffle_btn: BtnAttr = {
             True: {
@@ -835,10 +836,9 @@ class Generator(Block.Instanctiating):
             }
         }
 
-        # Associated with is_first_audio
         prev_btn: BtnAttr = {
             True: {
-                "label": "⏮️",
+                "label": "⏮",
                 "style": ButtonStyle.secondary,
                 "disabled": True,
                 "callback": None,
@@ -853,7 +853,6 @@ class Generator(Block.Instanctiating):
             }
         }
 
-        # Associated with is_paused
         pause_and_play_btn: BtnAttr = {
             True: {
                 "label": "▶️",
@@ -871,7 +870,6 @@ class Generator(Block.Instanctiating):
             }
         }  
 
-        # Associated with is_last_audio
         skip_btn: BtnAttr = {
             True: {
                 "label": "⏭️",
@@ -889,7 +887,6 @@ class Generator(Block.Instanctiating):
             }
         }
 
-        # Assoicated with loop_mode
         loop_btn: BtnAttr = {
             0: {
                 "label": "➡️",      # Linear playing mode
@@ -918,14 +915,14 @@ class Generator(Block.Instanctiating):
             True: {
                 "label": "🛠️",
                 "style": ButtonStyle.secondary,
-                "disabled": False,
+                "disabled": True,
                 "callback": Callback.Button.callback_refresh,
                 "row": 1
             },
             False: {
                 "label": "🛠️",
                 "style": ButtonStyle.secondary,
-                "disabled": False,
+                "disabled": True,
                 "callback": Callback.Button.callback_refresh,
                 "row": 1
             }
@@ -982,7 +979,6 @@ class Generator(Block.Instanctiating):
             }
         }
 
-        
         reset_btn: BtnAttr = {
             True: {
                 "label": "🔄️",
