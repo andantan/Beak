@@ -773,10 +773,10 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_video_founded(metadata: Union[Context, Interaction], query: str) -> None:
+        async def notice_video_founded(metadata: Union[Context, Interaction], title: str) -> None:
             values = {
                 "title" : "🎵 음원을 찾았습니다. 🎵",
-                "description": f"검색 음원: {query}",
+                "description": f"검색된 음원: {title}",
                 "color" : ATTACHED_PLAYLIST_EMBED_COLOR
             }
 

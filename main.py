@@ -80,8 +80,9 @@ async def bplay(ctx: Context, *args) -> None:
         result: list = video.result().get("result")
         component: dict = result.__getitem__(0)
         URL: str = component.get("link")
+        title: str = component.get("title")
 
-        await BeakNotification.Playlist.notice_video_founded(metadata=ctx, query=query)
+        await BeakNotification.Playlist.notice_video_founded(metadata=ctx, title=title)
 
     await beak.beak_play(ctx=ctx, URL=URL)
 
