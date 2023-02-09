@@ -99,55 +99,55 @@ async def bhelp(ctx: Context) -> None:
     )
 
     embed.add_field(
-        name = "🔀  버튼",
+        name = "버튼:  🔀",
         value = "재생 완료된 음원과 재생 대기 중인 음원 모두 셔플합니다.",
         inline = False
     )
 
     embed.add_field(
-        name = "⏮, ⏭️  버튼",
+        name = "버튼:  ⏮,  ⏭️",
         value = "이전 음원을 다시 재생하거나 다음 음원을 재생합니다.",
         inline = False
     )
 
     embed.add_field(
-        name = "▶️, ⏸️  버튼",
+        name = "버튼:  ▶️,  ⏸️",
         value = "재생 중이면 일시정지, 일시정지 중이면 다시 재생합니다.",
         inline = False
     )
 
     embed.add_field(
-        name = "➡️, 🔁, 🔂  버튼",
+        name = "버튼:  ➡️,  🔁,  🔂",
         value = "재생 모드를 번갈아가며 변경합니다. \n변경된 재생 모드는 플레이어의 \"재생 모드\"를 확인해주세요.",
         inline = False
     )
 
     embed.add_field(
-        name = "🔄️  버튼",
+        name = "버튼:  🔄️",
         value = "현재 재생 중인 음원을 제외한 모든 대기열을 초기화합니다.",
         inline = False
     )
 
     embed.add_field(
-        name = "🗑️  버튼",
+        name = "버튼:  🗑️",
         value = "다음 대기 중인 음원 1개를 삭제합니다.",
         inline = False
     )
 
     embed.add_field(
-        name = "📜  버튼",
+        name = "버튼:  📜",
         value = "현재 재생 중인 음원을 기준으로 재생 완료된 음원 2개, 대기 중인 음원 2개를 출력합니다.",
         inline = False
     )
 
     embed.add_field(
-        name = "⏹️  버튼",
+        name = "버튼:  ⏹️",
         value = "Beak를 정지 및 퇴장시킵니다.",
         inline = False
     )
 
     embed.add_field(
-        name = "🛠️  버튼 ( 버그 현상 발견 및 해결 중 -> 버튼 임시 비활성화 )",
+        name = "버튼:  🛠️  ( 버그 발견 및 해결 중 → 버튼 임시 비활성화 )",
         value = "플레이어가 버그에 걸리거나 오류 발생 시 현상을 해결한 후 재입장시킵니다.",
         inline = False
     )

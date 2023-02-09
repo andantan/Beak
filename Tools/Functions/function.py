@@ -754,7 +754,7 @@ class BeakNotification(Block.Instanctiating):
         @staticmethod
         async def notice_forced_play(metadata: Union[Context, Interaction], audio: Dict[str, str]) -> None:
             values = {
-                "title" : f"{audio.get('title')}을 먼저 재생합니다.",
+                "title" : f"{audio.get('title')}을(를) 먼저 재생합니다.",
                 "description": f"{audio.get('uploader')}",
                 "color" : ATTACHED_PLAYLIST_EMBED_COLOR
             }
