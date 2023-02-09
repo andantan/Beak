@@ -4,16 +4,20 @@ from typing import Optional
 
 import discord
 import validators
+import youtubesearchpython
 
-from discord import Intents, SelectOption
-from discord.ui import Select
+from discord import Intents
 from discord.ext import commands
 from discord.ext.commands.context import Context
 
 from Admin.Private.manager import Manager
 from Admin.DSC.debugger import Debugger
 
-from Tools.Functions.function import CommandNotification, AdminNotification
+from Tools.Functions.function import (
+    CommandNotification, 
+    AdminNotification, 
+    BeakNotification
+)
 
 from Core.Cache.storage import Storage
 from Core.beak import Beak
@@ -60,14 +64,28 @@ async def on_command_error(ctx: Context, e: Exception):
 
 
 @bot.command(aliases=["play", "p", "P", "재생", "제로"])
-async def bplay(ctx: Context, URL: str) -> None:
+async def bplay(ctx: Context, *args) -> None:
     await ctx.message.delete()
 
-    if validators.url(URL):
-        await beak.beak_play(ctx=ctx, URL=URL)
+    if validators.url(args.__getitem__(0)):
+        URL = args.__getitem__(0)
 
     else:
-        await CommandNotification.Error.notice_unvalid_url(ctx=ctx)
+        # deprecated 2023-02-09
+        # await CommandNotification.Error.notice_unvalid_url(ctx=ctx)
+
+        query: str = " ".join(args)
+
+        video = youtubesearchpython.VideosSearch(query=query, limit=1)
+        result: list = video.result().get("result")
+        component: dict = result.__getitem__(0)
+        URL: str = component.get("link")
+
+        await BeakNotification.Playlist.notice_video_founded(metadata=ctx, query=query)
+
+    await beak.beak_play(ctx=ctx, URL=URL)
+
+
 
 
 

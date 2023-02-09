@@ -762,9 +762,20 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_reset_playlist(metadata: Union[Context, Interaction], player: Player) -> None:
+        async def notice_reset_playlist(metadata: Union[Context, Interaction]) -> None:
             values = {
                 "title" : "플레이리스트가 초기화되었습니다.",
+                "color" : ATTACHED_PLAYLIST_EMBED_COLOR
+            }
+
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
+
+
+        @staticmethod
+        async def notice_video_founded(metadata: Union[Context, Interaction], query: str) -> None:
+            values = {
+                "title" : "🎵 음원을 찾았습니다. 🎵",
+                "description": f"검색 음원: {query}",
                 "color" : ATTACHED_PLAYLIST_EMBED_COLOR
             }
 
