@@ -63,7 +63,7 @@ async def on_command_error(ctx: Context, e: Exception):
 
 
 
-@bot.command(aliases=["play", "p", "P"])
+@bot.command(aliases=["play", "p", "P", "재생", "제로"])
 async def bplay(ctx: Context, *args) -> None:
     await ctx.message.delete()
 
@@ -153,7 +153,7 @@ async def bhelp(ctx: Context) -> None:
     )
 
     embed.set_footer(
-        text = "Beak By Qean"
+        text = "Beak By Qbean"
     )
 
     await ctx.send(embed=embed)
