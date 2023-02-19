@@ -6,7 +6,8 @@ from typing import (
 
 import asyncio
 
-import youtube_dl
+# import youtube_dl
+from yt_dlp import YoutubeDL
 import discord
 
 from discord.channel import VoiceChannel, StageChannel
@@ -22,7 +23,7 @@ from Core.Cache.storage import Storage
 class YoutubeDlExtractor(Block.Instanctiating):
     @staticmethod
     async def extract(URL: str, DEBUG=False) -> Union[List[Dict[str, str]], Dict[str, Any], None]:
-        __ytdl = youtube_dl.YoutubeDL(YTDL_OPTION)
+        __ytdl = YoutubeDL(YTDL_OPTION)
         __ytdl.cache.remove()
 
         try:
