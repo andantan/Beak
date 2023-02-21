@@ -200,7 +200,8 @@ class Beak(metaclass=Singleton):
                     if guild_player.is_voice_channel_empty:
                         await self.beak_exit(ctx=ctx)
                         
-                        await BeakNotification.Playlist.notice_empty_voice_channel(metadata=ctx)
+                        # deprecated 2023-02-21
+                        # await BeakNotification.Playlist.notice_empty_voice_channel(metadata=ctx)
                         
                         return
 
