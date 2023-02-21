@@ -354,15 +354,18 @@ class BeakNotification(Block.Instanctiating):
     class Default(Block.Instanctiating):
         @staticmethod
         async def notice_default_embed(metadata: Union[Context, Interaction], delay: int=DEFAULT_DELAY,**kwargs) -> None:
-            _embed = Embed(**kwargs)
+            try:
+                _embed = Embed(**kwargs)
 
-            _embed.set_footer(text="Beak by Qbean")
+                _embed.set_footer(text="Beak by Qbean")
 
-            if isinstance(metadata, Context):
-                await metadata.send(embed=_embed, delete_after=delay)
-            
-            elif isinstance(metadata, Interaction):
-                await metadata.response.send_message(embed=_embed, delete_after=delay)
+                if isinstance(metadata, Context):
+                    await metadata.send(embed=_embed, delete_after=delay)
+                
+                elif isinstance(metadata, Interaction):
+                    await metadata.response.send_message(embed=_embed, delete_after=delay)
+            except Exception as e:
+                print(e)
 
 
 
@@ -778,6 +781,16 @@ class BeakNotification(Block.Instanctiating):
                 "title" : "🎵 음원을 찾았습니다. 🎵",
                 "description": f"검색된 음원: {title}",
                 "color" : ATTACHED_PLAYLIST_EMBED_COLOR
+            }
+
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
+
+
+        @staticmethod
+        async def notice_empty_voice_channel(metadata: Union[Context, Interaction]) -> None:
+            values = {
+                "title" : "빈 음성 채널이 감지되었습니다.",
+                "color" : ENDED_PLAYLIST_NOTICE_COLOR
             }
 
             await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)

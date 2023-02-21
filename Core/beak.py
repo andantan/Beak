@@ -187,7 +187,7 @@ class Beak(metaclass=Singleton):
 
             while guild_player.is_playing or guild_player.is_paused:
                 if not guild_player.is_connected:
-                    await BeakNotification.Playlist.discard(ctx=ctx, player=guild_player)
+                    await BeakNotification.Playlist.discard(metadata=ctx, player=guild_player)
 
                     self.__discard_pool__(guild_id=guild_id)
                     
@@ -197,10 +197,14 @@ class Beak(metaclass=Singleton):
 
             else:
                 if guild_player.is_connected:
-                    if guild_player.is_repeat_mode:
-                        pass
+                    if guild_player.is_voice_channel_empty:
+                        await self.beak_exit(ctx=ctx)
+                        
+                        await BeakNotification.Playlist.notice_empty_voice_channel(metadata=ctx)
+                        
+                        return
 
-                    else:
+                    if not guild_player.is_repeat_mode:
                         try:
                             guild_player.dequeue()
 

@@ -10,7 +10,8 @@ import random
 from discord import (
     VoiceClient, 
     Guild, 
-    VoiceChannel
+    VoiceChannel,
+    Member
 )
 
 from discord.ext.commands.context import Message
@@ -55,6 +56,10 @@ class Player:
     def voice_client_guild(self) -> Guild: return self.VOICECLIENT.guild
     @property
     def voice_client_channel(self) -> VoiceChannel: return self.VOICECLIENT.channel
+    @property
+    def voice_channel_members(self) -> List[Member]: return self.VOICECLIENT.channel.members
+    @property
+    def is_voice_channel_empty(self) -> bool: return len(self.VOICECLIENT.channel.members) == 1
     @property
     def server_name(self) -> str: return self.VOICECLIENT.guild.name
     @property
