@@ -5,10 +5,9 @@ from typing import (
 import asyncio
 import discord
 
-from discord import Embed, FFmpegPCMAudio, SelectOption
-from discord.ui import Select, View
+from discord import Embed, FFmpegPCMAudio
 from discord.voice_client import VoiceClient
-from discord.ext.commands.context import Context, Message, Interaction
+from discord.ext.commands.context import Context, Message
 
 from Class.superclass import Singleton
 
@@ -89,7 +88,7 @@ class Beak(metaclass=Singleton):
         
         return data
 
-    
+
     async def beak_enter(self, ctx: Context) -> None:
         voice_channel = ContextExtractor.get_author_entered_voice_channel(ctx)
         
@@ -100,7 +99,7 @@ class Beak(metaclass=Singleton):
             
         except BeakErrors.AlreadyAllocatedGuildId as e:
             print(f"{e.__doc__}\n{e}\n")
-
+ 
 
     async def beak_exit(self, ctx: Context) -> None:
         guild_id = ContextExtractor.get_guild_id(ctx)
@@ -109,7 +108,7 @@ class Beak(metaclass=Singleton):
 
         if guild_player.is_connected:
             await guild_player.voice_client.disconnect()
-        
+
         await BeakNotification.Playlist.discard(metadata=ctx, player=guild_player)
 
         self.__discard_pool__(guild_id=guild_id)
@@ -120,11 +119,16 @@ class Beak(metaclass=Singleton):
 
         if ContextExtractor.is_beak_joined_voice_channel(ctx=ctx):
             if not ContextExtractor.is_beak_and_author_same_voice_channel(ctx=ctx):
-                await BeakNotification.Error.notice_not_same_channel(ctx=ctx)
+                await BeakNotification.Error.notice_not_same_channel(metadata=ctx)
 
                 return
             
         else:
+            if not ContextExtractor.is_author_joined_voice_channel(ctx=ctx):
+                await BeakNotification.Error.notice_author_not_entered_channel(metadata=ctx)
+
+                return
+                
             await self.beak_enter(ctx=ctx)
 
         guild_player = self.__get_guild_player(guild_id)
