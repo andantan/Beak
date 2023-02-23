@@ -51,6 +51,8 @@ class Player:
     @property
     def over_queue(self) -> AsyncQueue.OverQueue: return self.OVERQUEUE
     @property
+    def message_storage(self) -> Storage.Message: return self.MESSAGESTORAGE
+    @property
     def voice_client(self) -> VoiceClient: return self.VOICECLIENT
     @property
     def voice_client_guild(self) -> Guild: return self.VOICECLIENT.guild

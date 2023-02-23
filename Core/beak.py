@@ -59,22 +59,26 @@ class Beak(metaclass=Singleton):
 
             raise BeakErrors.AllocationError
         
-        player = Player(
+        _player = Player(
             voice_client = voice_client,
             message_storage = Storage.Message(guild_id=guild_id),
             queue = AsyncQueue.Queue(),
             over_queue = AsyncQueue.OverQueue()
         )
         
-        self.player_pool.__setitem__(guild_id, player)
+        self.player_pool.__setitem__(guild_id=guild_id, player=_player)
         
 
     def __discard_pool__(self, guild_id) -> None:
         self.player_pool.__delitem__(guild_id)
 
 
-    def __get_guild_player(self, guild_id: int) -> Player:
-        return self.player_pool.__getitem__(guild_id)
+    def __get_guild_player(self, guild_id: int) -> Optional[Player]:
+        try:
+            return self.player_pool.__getitem__(guild_id)
+        
+        except ValueError:
+            return None
 
     
     def DSC_get_guild_player(self, guild_id) ->Optional[Player]:
@@ -90,17 +94,20 @@ class Beak(metaclass=Singleton):
         
         return data
 
+    
+
+
 
     async def beak_enter(self, ctx: Context) -> None:
-        guild_id = ContextExtractor.get_guild_id(ctx=ctx)
-        voice_channel = ContextExtractor.get_author_entered_voice_channel(ctx)
-        voice_client = await voice_channel.connect(self_deaf=True)
-
         try:
+            guild_id = ContextExtractor.get_guild_id(ctx=ctx)
+            voice_channel = ContextExtractor.get_author_entered_voice_channel(ctx)
+            voice_client = await voice_channel.connect(self_deaf=True)
+
             self.__alloc_pool__(guild_id=guild_id, voice_client=voice_client)
             
-        except BeakErrors.AlreadyAllocatedGuildId as e:
-            print(f"{e.__doc__}\n{e}\n")
+        except BeakErrors.AllocationError:
+            pass
  
 
     async def beak_exit(self, ctx: Context) -> None:

@@ -27,7 +27,7 @@ class PlayerPool(metaclass=Singleton):
         if not guild_id in self.player_pool:
             return self.player_pool.__getitem__(guild_id)
 
-        raise ValueError(f"Unallocated guild id({guild_id})")
+        raise ValueError
 
 
     def __delitem__(self, guild_id: int) -> None:
