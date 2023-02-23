@@ -5,7 +5,12 @@ from Class.superclass import Singleton
 from Core.Cache.player import Player
 
 
+
 class PlayerPool(metaclass=Singleton):
+    __slots__ = (
+        "player_pool",
+    )
+
     def __init__(self) -> None:
         self.player_pool: Dict[int, Player] = dict()
 
@@ -19,7 +24,10 @@ class PlayerPool(metaclass=Singleton):
 
 
     def __getitem__(self, guild_id: int) -> Player:
-        return self.player_pool.__getitem__(guild_id)
+        if not guild_id in self.player_pool:
+            return self.player_pool.__getitem__(guild_id)
+
+        raise ValueError(f"Unallocated guild id({guild_id})")
 
 
     def __delitem__(self, guild_id: int) -> None:

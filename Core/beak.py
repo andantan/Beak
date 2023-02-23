@@ -44,18 +44,20 @@ class Beak(metaclass=Singleton):
         self.player_pool: PlayerPool = PlayerPool()
 
 
-    def __alloc_pool__(self, ctx: Context, voice_client: VoiceClient) -> None:
-        guild_id = ContextExtractor.get_guild_id(ctx)
-
+    def __alloc_pool__(self, guild_id: int, voice_client: VoiceClient) -> None:
         if guild_id in self.player_pool:
-            player: Player = self.player_pool.__getitem__(guild_id)
+            # deprcated 2023-02-23 
+            #
+            # player: Player = self.player_pool.__getitem__(guild_id)
+            #
+            # raise BeakErrors.AlreadyAllocatedGuildId(
+            #     guild_id = guild_id,
+            #     is_connected = player.is_connected,
+            #     is_activated = player.is_activated,
+            #     is_msg_saved = player.is_message_saved
+            # )
 
-            raise BeakErrors.AlreadyAllocatedGuildId(
-                guild_id = guild_id,
-                is_connected = player.is_connected,
-                is_activated = player.is_activated,
-                is_msg_saved = player.is_message_saved
-            )
+            raise BeakErrors.AllocationError
         
         player = Player(
             voice_client = voice_client,
@@ -90,12 +92,12 @@ class Beak(metaclass=Singleton):
 
 
     async def beak_enter(self, ctx: Context) -> None:
+        guild_id = ContextExtractor.get_guild_id(ctx=ctx)
         voice_channel = ContextExtractor.get_author_entered_voice_channel(ctx)
-        
         voice_client = await voice_channel.connect(self_deaf=True)
 
         try:
-            self.__alloc_pool__(ctx=ctx, voice_client=voice_client)
+            self.__alloc_pool__(guild_id=guild_id, voice_client=voice_client)
             
         except BeakErrors.AlreadyAllocatedGuildId as e:
             print(f"{e.__doc__}\n{e}\n")
