@@ -24,7 +24,7 @@ class PlayerPool(metaclass=Singleton):
 
 
     def __getitem__(self, guild_id: int) -> Player:
-        if not guild_id in self.player_pool:
+        if guild_id in self.player_pool:
             return self.player_pool.__getitem__(guild_id)
 
         raise ValueError

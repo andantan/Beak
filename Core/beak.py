@@ -141,7 +141,7 @@ class Beak(metaclass=Singleton):
             await self.beak_enter(ctx=ctx)
 
         guild_player = self.__get_guild_player(guild_id)
-        
+
         __em: Optional[Message] = None
         
         if "playlist" in URL:
@@ -175,10 +175,13 @@ class Beak(metaclass=Singleton):
 
         try:
             guild_player.enqueue(audios=audios)
-        
+
         except AsyncQueueErrors.QueueSaturatedErorr:
             # TODO: Handling this section
             pass
+        
+        except Exception as e:
+            print(e)
 
         await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
     
@@ -195,6 +198,7 @@ class Beak(metaclass=Singleton):
                 await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx)
 
                 return
+
 
             await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
