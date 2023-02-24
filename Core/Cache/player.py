@@ -18,7 +18,7 @@ from discord.ext.commands.context import Message
 
 from Core.Cache.storage import Storage
 from Core.Cache.Queue.queue import AsyncQueue
-from Core.Cache.Queue.Errors.queue_error import AsyncQueueErrors
+from Core.Errors.error import AsyncQueueError
 
 # deprecated 2023-01-10
 # from Core.Cache.Errors.status_error import PlayerErrors
@@ -144,7 +144,7 @@ class Player:
         try:
             self.QUEUE.enqueue(audios)
         
-        except AsyncQueueErrors.QueueSaturatedErorr as throwable:
+        except AsyncQueueError.SaturatedQueueError as throwable:
             raise throwable
 
 
@@ -155,7 +155,7 @@ class Player:
             if played_audio.get("title") is not None:
                 self.OVERQUEUE.enqueue([played_audio])
         
-        except AsyncQueueErrors.OverQueueSaturatedErorr as throwable:
+        except AsyncQueueError.SaturatedOverQueueError as throwable:
             raise throwable
 
 

@@ -818,6 +818,18 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
+        async def notice_saturated_overqueue(metadata: Metadata) -> None:
+            values = {
+                "title" : f"재생완료 대기열이 가득찼습니다. (최대 재생완료 대기열 음원 수: {OVER_QUEUE_THRESHOLD})",
+                "description": f"가장 먼저 재생완료된 음원부터 순서대로 자동 삭제됩니다.",
+                "color" : ENDED_PLAYLIST_NOTICE_COLOR
+            }
+
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
+
+
+
+        @staticmethod
         async def deploy(player: Player, ctx: Optional[Context]=None) -> None:
             _embed = BeakNotification.Playlist.PlaylistEmbedGenerator.get_player_embed(player=player)
             _view = BeakNotification.Playlist.PlaylistViewGenerator.get_player_view(player=player)

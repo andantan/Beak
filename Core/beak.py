@@ -17,9 +17,8 @@ from Core.Cache.pool import PlayerPool
 from Core.Cache.player import Player
 from Core.Cache.storage import Storage
 from Core.Cache.Queue.queue import AsyncQueue
-from Core.Cache.Queue.Errors.queue_error import AsyncQueueErrors
 
-from Core.Errors.error import BeakError
+from Core.Errors.error import BeakError, AsyncQueueError
 
 from Tools.Functions.function import BeakNotification
 
@@ -200,7 +199,7 @@ class Beak(metaclass=Singleton):
             # TODO: Handling this section
             await Logger.EmbedNotification.notice_unallocated_guild_id(metadata=ctx, ero=e)
 
-        except AsyncQueueErrors.QueueSaturatedErorr:
+        except AsyncQueueError.SaturatedQueueError:
             # TODO: Handling this section
             await BeakNotification.Playlist.notice_saturated_queue(metadata=ctx)
 
@@ -246,9 +245,9 @@ class Beak(metaclass=Singleton):
 
                                 await BeakNotification.Playlist.notice_looping(metadata=ctx)
 
-                        except AsyncQueueErrors.OverQueueSaturatedErorr:
+                        except AsyncQueueError.SaturatedOverQueueError:
                             # TODO: Handling this section
-                            pass
+                            await BeakNotification.Playlist.notice_saturated_overqueue(metadata=ctx)
 
                     await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
