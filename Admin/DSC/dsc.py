@@ -118,15 +118,9 @@ class Logger(Block.Instanctiating):
         @staticmethod
         async def notice_unallocated_guild_id(metadata: Metadata, ero: Exception) -> None:
             values = {
-                "title" : "Player allocation Warning", 
+                "title" : f"{ero.__class__}", 
                 "description" : f"Unallocated guild id({metadata.guild.id})",
                 "color" : DSC_NOTICE_EMBED_COLOR
             }
 
-            fields = {
-                "name": "ValueError",
-                "value": f"{ero}",
-                "inline": False
-            }
-
-            await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values, fields=fields)
+            await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values)
