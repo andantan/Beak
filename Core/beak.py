@@ -76,12 +76,12 @@ class Beak(metaclass=Singleton):
         self.player_pool.__delitem__(guild_id)
 
 
-    def __get_guild_player(self, guild_id: int) -> Optional[Player]:
+    def __get_guild_player(self, guild_id: int) -> Player:
         try:
             return self.player_pool.__getitem__(guild_id)
         
-        except ValueError:
-            return None
+        except ValueError as throwable_ValueError:
+            raise throwable_ValueError
 
     
     def DSC_get_guild_player(self, guild_id) ->Optional[Player]:
@@ -97,6 +97,40 @@ class Beak(metaclass=Singleton):
         
         return data
 
+
+    async def __notice_extract_info(self, ctx: Context, URL: str) -> List[Dict[str, str]]:
+        __em: Optional[Message] = None
+        
+        if "playlist" in URL:
+            _embed = Embed(
+                title = "플레이리스트 추출 및 변환 중...", 
+                color = PLAYLIST_NOTICE_EMBED_COLOR
+            )
+
+            _embed.set_footer(text="Beak by Qbean")
+
+            __em = await ctx.send(embed=_embed)
+
+        audios = await self.__ytdl_executor(URL=URL)
+
+        if __em is not None:
+            message = "추출 및 변환 완료.\n"
+            message += f"플레이리스트 제목: {audios.__getitem__(-1).get('playlist_title')} | "
+            message += f"음원 수: {len(audios)}"
+
+            _embed = Embed(
+                title = "추출 및 변환 완료", 
+                color = PLAYLIST_NOTICE_EMBED_COLOR
+            )
+
+            _embed.add_field(name="플레이리스트 제목", value=f"{audios.__getitem__(-1).get('playlist_title')}", inline=True)
+            _embed.add_field(name="음원 수", value=f"{len(audios)}개", inline=True)
+        
+            _embed.set_footer(text="Beak by Qbean")
+
+            await __em.edit(embed=_embed, delete_after=DEFAULT_DELAY * 2)
+
+        return audios
 
 
     async def beak_enter(self, ctx: Context) -> None:
@@ -146,46 +180,20 @@ class Beak(metaclass=Singleton):
                 
             await self.beak_enter(ctx=ctx)
 
-        guild_player = self.__get_guild_player(guild_id)
-
-        __em: Optional[Message] = None
-        
-        if "playlist" in URL:
-            _embed = Embed(
-                title = "플레이리스트 추출 및 변환 중...", 
-                color = PLAYLIST_NOTICE_EMBED_COLOR
-            )
-
-            _embed.set_footer(text="Beak by Qbean")
-
-            __em = await ctx.send(embed=_embed)
-
-        audios = await self.__ytdl_executor(URL=URL)
-
-        if __em is not None:
-            message = "추출 및 변환 완료.\n"
-            message += f"플레이리스트 제목: {audios.__getitem__(-1).get('playlist_title')} | "
-            message += f"음원 수: {len(audios)}"
-
-            _embed = Embed(
-                title = "추출 및 변환 완료", 
-                color = PLAYLIST_NOTICE_EMBED_COLOR
-            )
-
-            _embed.add_field(name="플레이리스트 제목", value=f"{audios.__getitem__(-1).get('playlist_title')}", inline=True)
-            _embed.add_field(name="음원 수", value=f"{len(audios)}개", inline=True)
-        
-            _embed.set_footer(text="Beak by Qbean")
-
-            await __em.edit(embed=_embed, delete_after=DEFAULT_DELAY * 2)
-
+        audios = await self.__notice_extract_info(ctx=ctx, URL=URL)
+    
         try:
+            guild_player = self.__get_guild_player(guild_id)
+
             guild_player.enqueue(audios=audios)
 
         except AsyncQueueErrors.QueueSaturatedErorr:
             # TODO: Handling this section
             pass
         
+        except ValueError:
+
+
         except Exception as e:
             print(e)
 

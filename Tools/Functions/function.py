@@ -33,6 +33,7 @@ R = TypeVar("R")                # return type
 stat = Union[int, bool]
 Function = Callable[[A], R]
 O_all = Union[bool, str, int, Function, None]
+Metadata = Union[Context, Interaction]
 
 BtnStat = NewType("BtnStat", Dict[str, O_all[Interaction, Coroutine]])
 BtnAttr = NewType("BtnAttr", Dict[stat, BtnStat])
@@ -324,6 +325,11 @@ class CommandNotification(Block.Instanctiating):
             await CommandNotification.Default.notice_default_embed(ctx=ctx, **values)
 
 
+        @staticmethod
+        async def notice_unallocated_guild_id(metadata: Metadata) -> None:
+            ...
+
+
 
 class AdminNotification(Block.Instanctiating):
     class Default(Block.Instanctiating):
@@ -353,7 +359,7 @@ class AdminNotification(Block.Instanctiating):
 class BeakNotification(Block.Instanctiating):
     class Default(Block.Instanctiating):
         @staticmethod
-        async def notice_default_embed(metadata: Union[Context, Interaction], delay: int=DEFAULT_DELAY,**kwargs) -> None:
+        async def notice_default_embed(metadata: Metadata, delay: int=DEFAULT_DELAY,**kwargs) -> None:
             try:
                 _embed = Embed(**kwargs)
 
@@ -371,7 +377,7 @@ class BeakNotification(Block.Instanctiating):
 
     class Error(Block.Instanctiating):
         @staticmethod
-        async def notice_already_beak_enterenced(metadata: Union[Context, Interaction]) -> None:
+        async def notice_already_beak_enterenced(metadata: Metadata) -> None:
             values = {
                 "title" : "봇이 이미 입장한 상태입니다.", 
                 "description" : "만약 봇이 입장하지 않은 상태이면서, 이 오류가 발생한다면 ~리셋 명령어를 입력해주세요.", 
@@ -382,7 +388,7 @@ class BeakNotification(Block.Instanctiating):
 
             
         @staticmethod
-        async def notice_author_not_entered_channel(metadata: Union[Context, Interaction]) -> None:
+        async def notice_author_not_entered_channel(metadata: Metadata) -> None:
             values = {
                 "title" : "음성 채널에 입장 후 명령어를 입력해주세요.",
                 "color" : NOTICE_EMBED_COLOR
@@ -392,7 +398,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_beak_not_entered_channel(metadata: Union[Context, Interaction]) -> None:
+        async def notice_beak_not_entered_channel(metadata: Metadata) -> None:
             values = {
                 "title" : "봇이 음성 채널에 입장한 상태가 아닙니다.",
                 "color" : NOTICE_EMBED_COLOR
@@ -402,7 +408,7 @@ class BeakNotification(Block.Instanctiating):
 
         
         @staticmethod
-        async def notice_not_same_channel(metadata: Union[Context, Interaction]) -> None:
+        async def notice_not_same_channel(metadata: Metadata) -> None:
             values = {
                 "title" : "봇과 동일한 채널에 입장 후 명령어를 입력해주세요.",
                 "color" : NOTICE_EMBED_COLOR
@@ -412,7 +418,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_last_audio(metadata: Union[Context, Interaction]) -> None:
+        async def notice_last_audio(metadata: Metadata) -> None:
             values = {
                 "title" : "마지막 음원입니다.",
                 "color" : NOTICE_EMBED_COLOR
@@ -422,7 +428,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_first_audio(metadata: Union[Context, Interaction]) -> None:
+        async def notice_first_audio(metadata: Metadata) -> None:
             values = {
                 "title" : "첫 번째 음원입니다.",
                 "color" : NOTICE_EMBED_COLOR
@@ -432,7 +438,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_already_paused(metadata: Union[Context, Interaction]) -> None:
+        async def notice_already_paused(metadata: Metadata) -> None:
             values = {
                 "title" : "이미 일시정지된 상태입니다.",
                 "color" : NOTICE_EMBED_COLOR
@@ -442,7 +448,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_already_playing(metadata: Union[Context, Interaction]) -> None:
+        async def notice_already_playing(metadata: Metadata) -> None:
             values = {
                 "title" : "이미 재생 중인 상태입니다.",
                 "color" : NOTICE_EMBED_COLOR
@@ -693,7 +699,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_player_discarded_embed(metadata: Union[Context, Interaction]):
+        async def notice_player_discarded_embed(metadata: Metadata):
             values = {
                 "title" : "플레이어가 종료되었습니다.",
                 "color" : NOTICE_EMBED_COLOR
@@ -723,7 +729,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_removed(metadata: Union[Context, Interaction], title: str):
+        async def notice_removed(metadata: Metadata, title: str):
             values = {
                 "title" : "음원 삭제가 완료되었습니다.",
                 "description": f"삭제된 음원: {title}",
@@ -734,7 +740,7 @@ class BeakNotification(Block.Instanctiating):
         
 
         @staticmethod
-        async def notice_impossible_shuffling(metadata: Union[Context, Interaction]) -> None:
+        async def notice_impossible_shuffling(metadata: Metadata) -> None:
             values = {
                 "title" : "추가된 음원이나 재생된 음원이 없습니다.",
                 "color" : NOTICE_EMBED_COLOR
@@ -744,7 +750,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_playlist(metadata: Union[Context, Interaction], player: Player) -> None:
+        async def notice_playlist(metadata: Metadata, player: Player) -> None:
             _embed = BeakNotification.Playlist.PlaylistEmbedGenerator.get_playlist_embed(player=player)
 
             if isinstance(metadata, Context):
@@ -755,7 +761,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_forced_play(metadata: Union[Context, Interaction], audio: Dict[str, str]) -> None:
+        async def notice_forced_play(metadata: Metadata, audio: Dict[str, str]) -> None:
             values = {
                 "title" : f"{audio.get('title')}을(를) 먼저 재생합니다.",
                 "description": f"{audio.get('uploader')}",
@@ -766,7 +772,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_reset_playlist(metadata: Union[Context, Interaction]) -> None:
+        async def notice_reset_playlist(metadata: Metadata) -> None:
             values = {
                 "title" : "플레이리스트가 초기화되었습니다.",
                 "color" : ATTACHED_PLAYLIST_EMBED_COLOR
@@ -776,7 +782,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_video_founded(metadata: Union[Context, Interaction], title: str) -> None:
+        async def notice_video_founded(metadata: Metadata, title: str) -> None:
             values = {
                 "title" : "🎵 음원을 찾았습니다. 🎵",
                 "description": f"검색된 음원: {title}",
@@ -787,7 +793,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_empty_voice_channel(metadata: Union[Context, Interaction]) -> None:
+        async def notice_empty_voice_channel(metadata: Metadata) -> None:
             values = {
                 "title" : "빈 음성 채널이 감지되었습니다.",
                 "color" : ENDED_PLAYLIST_NOTICE_COLOR
@@ -820,7 +826,7 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def discard(metadata: Union[Context, Interaction], player: Player) -> None:
+        async def discard(metadata: Metadata, player: Player) -> None:
             if player.is_message_saved:
                 await player.message.delete()
             
