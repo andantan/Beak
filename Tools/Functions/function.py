@@ -305,6 +305,7 @@ class CommandNotification(Block.Instanctiating):
     class Error(Block.Instanctiating):
         @staticmethod
         async def notice_missing_required_arguments(ctx: Context) -> None:
+            # TODO: Type change :: Context to Metadata
             values = {
                 "title" : "Beak-play 명령어 오류", 
                 "description" : "음원 주소를 함께 입력해주세요",
@@ -316,6 +317,7 @@ class CommandNotification(Block.Instanctiating):
 
         @staticmethod
         async def notice_unvalid_url(ctx: Context) -> None:
+            # TODO: Type change :: Context to Metadata
             values = {
                 "title" : "Beak-play 주소 오류", 
                 "description" : "주소가 옳바르지 않습니다.",
@@ -325,9 +327,6 @@ class CommandNotification(Block.Instanctiating):
             await CommandNotification.Default.notice_default_embed(ctx=ctx, **values)
 
 
-        @staticmethod
-        async def notice_unallocated_guild_id(metadata: Metadata) -> None:
-            ...
 
 
 

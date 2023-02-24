@@ -11,7 +11,7 @@ from discord.ext.commands.context import Context, Message
 
 from Class.superclass import Singleton
 
-from Admin.DSC.dsc import DSC
+from Admin.DSC.dsc import DSC, Logger
 
 from Core.Cache.pool import PlayerPool
 from Core.Cache.player import Player
@@ -80,8 +80,8 @@ class Beak(metaclass=Singleton):
         try:
             return self.player_pool.__getitem__(guild_id)
         
-        except ValueError as throwable_ValueError:
-            raise throwable_ValueError
+        except ValueError:
+            raise ValueError("Raised on Beak.__get_guild_player")
 
     
     def DSC_get_guild_player(self, guild_id) ->Optional[Player]:
@@ -191,8 +191,9 @@ class Beak(metaclass=Singleton):
             # TODO: Handling this section
             pass
         
-        except ValueError:
-
+        except ValueError as e:
+            # TODO: Handling this section
+            await Logger.EmbedNotification.notice_unallocated_guild_id(metadata=ctx, ero=e)
 
         except Exception as e:
             print(e)
