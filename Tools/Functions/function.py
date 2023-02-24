@@ -122,15 +122,6 @@ class Callback(Block.Instanctiating):
 
         @staticmethod
         @CallbackInspector.coro_interaction_inspection()
-        async def callback_haevy_playlist(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-            if guild_player.is_connected:
-                await BeakNotification.Playlist.notice_playlist(metadata=interaction, player=guild_player)
-
-
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
         async def callback_loop(interaction: Interaction) -> None:
             guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
 
@@ -160,30 +151,6 @@ class Callback(Block.Instanctiating):
                     except AsyncQueueErrors.QueueSaturatedErorr:
                         # TODO: Handling this section
                         pass
-          
-        
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_remove(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-            if guild_player.is_queue_two_or_more:
-                if guild_player.is_connected:
-                    try:
-                        removed_audio_title = guild_player.seek_next_queue.get("title")
-
-                        guild_player.remove()
-
-                        await BeakNotification.Playlist.notice_removed(metadata=interaction, title=removed_audio_title)
-                        await BeakNotification.Playlist.deploy(player=guild_player)
-                    
-                    except IndexError:
-                        #TODO: Handling this section
-                        pass
-
-            else:
-                await BeakNotification.Error.notice_last_audio(metadata=interaction)     
-
 
         @staticmethod
         @CallbackInspector.coro_interaction_inspection()
@@ -217,41 +184,82 @@ class Callback(Block.Instanctiating):
                 await BeakNotification.Error.notice_already_paused(metadata=interaction)
 
 
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_exit(interaction: Interaction) -> None:
-            guild_id = InteractionExtractor.get_guild_id(interaction)
-            guild_player: Player = PlayerPool().get(guild_id)
+        # deprecated 2023-02-24
+        # 
+        # @staticmethod
+        # @CallbackInspector.coro_interaction_inspection()
+        # async def callback_exit(interaction: Interaction) -> None:
+        #     guild_id = InteractionExtractor.get_guild_id(interaction)
+        #     guild_player: Player = PlayerPool().get(guild_id)
 
-            if guild_player.is_connected:
-                await guild_player.voice_client.disconnect()
+        #     if guild_player.is_connected:
+        #         await guild_player.voice_client.disconnect()
 
-                PlayerPool().__delitem__(guild_id)
+        #         PlayerPool().__delitem__(guild_id)
                 
-                await BeakNotification.Playlist.discard(metadata=interaction, player=guild_player)
+        #         await BeakNotification.Playlist.discard(metadata=interaction, player=guild_player)
 
-        
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_refresh(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+        # deprecated 2023-02-24
+        #
+        # @staticmethod
+        # @CallbackInspector.coro_interaction_inspection()
+        # async def callback_haevy_playlist(interaction: Interaction) -> None:
+        #     guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
 
-            if guild_player.is_connected:
-                await BeakNotification.Playlist.deploy(player=guild_player)
-
-                await interaction.response.defer()
+        #     if guild_player.is_connected:
+        #         await BeakNotification.Playlist.notice_playlist(metadata=interaction, player=guild_player)
 
 
-        @staticmethod
-        @CallbackInspector.coro_interaction_inspection()
-        async def callback_reset(interaction: Interaction) -> None:
-            guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+        # deprecated 2023-02-24
+        #        
+        # @staticmethod
+        # @CallbackInspector.coro_interaction_inspection()
+        # async def callback_remove(interaction: Interaction) -> None:
+        #     guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
 
-            if guild_player.is_connected:
-                guild_player.reset()
+        #     if guild_player.is_queue_two_or_more:
+        #         if guild_player.is_connected:
+        #             try:
+        #                 removed_audio_title = guild_player.seek_next_queue.get("title")
 
-                await BeakNotification.Playlist.deploy(player=guild_player)
-                await BeakNotification.Playlist.notice_reset_playlist(metadata=interaction, player=guild_player)
+        #                 guild_player.remove()
+
+        #                 await BeakNotification.Playlist.notice_removed(metadata=interaction, title=removed_audio_title)
+        #                 await BeakNotification.Playlist.deploy(player=guild_player)
+                    
+        #             except IndexError:
+        #                 #TODO: Handling this section
+        #                 pass
+
+        #     else:
+        #         await BeakNotification.Error.notice_last_audio(metadata=interaction)     
+
+
+        # deprecated 2023-02-24
+        #        
+        # @staticmethod
+        # @CallbackInspector.coro_interaction_inspection()
+        # async def callback_refresh(interaction: Interaction) -> None:
+        #     guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+        #     if guild_player.is_connected:
+        #         await BeakNotification.Playlist.deploy(player=guild_player)
+
+        #         await interaction.response.defer()
+
+
+        # deprecated 2023-02-24
+        #
+        # @staticmethod
+        # @CallbackInspector.coro_interaction_inspection()
+        # async def callback_reset(interaction: Interaction) -> None:
+        #     guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
+
+        #     if guild_player.is_connected:
+        #         guild_player.reset()
+
+        #         await BeakNotification.Playlist.deploy(player=guild_player)
+        #         await BeakNotification.Playlist.notice_reset_playlist(metadata=interaction, player=guild_player)
 
 
 
@@ -861,26 +869,6 @@ class BeakNotification(Block.Instanctiating):
 
 class Generator(Block.Instanctiating):
     class Button(Block.Instanctiating):
-        # 셔플 이전 일정 다음 반복
-        # 초기화 삭제 플리 퇴장 초기
-
-        shuffle_btn: BtnAttr = {
-            True: {
-                "label": "🔀",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_shuffle,
-                "row": 0
-            },
-            False: {
-                "label": "🔀",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_shuffle,
-                "row": 0
-            }
-        }
-
         prev_btn: BtnAttr = {
             True: {
                 "label": "⏮",
@@ -932,6 +920,23 @@ class Generator(Block.Instanctiating):
             }
         }
 
+        shuffle_btn: BtnAttr = {
+            True: {
+                "label": "🔀",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_shuffle,
+                "row": 0
+            },
+            False: {
+                "label": "🔀",
+                "style": ButtonStyle.secondary,
+                "disabled": False,
+                "callback": Callback.Button.callback_shuffle,
+                "row": 0
+            }
+        }
+
         loop_btn: BtnAttr = {
             0: {
                 "label": "➡️",      # Linear playing mode
@@ -956,90 +961,94 @@ class Generator(Block.Instanctiating):
             }
         }
 
-        refresh_btn: BtnAttr = {
-            True: {
-                "label": "🛠️",
-                "style": ButtonStyle.secondary,
-                "disabled": True,
-                "callback": Callback.Button.callback_refresh,
-                "row": 1
-            },
-            False: {
-                "label": "🛠️",
-                "style": ButtonStyle.secondary,
-                "disabled": True,
-                "callback": Callback.Button.callback_refresh,
-                "row": 1
-            }
-        }
+        # deprecated 2023-02-24
+        #
+        # exit_btn: BtnAttr = {
+        #     True: {
+        #         "label": "⏹️",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": False,
+        #         "callback": Callback.Button.callback_exit,
+        #         "row": 1
+        #     },
+        #     False: {
+        #         "label": "⏹️",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": False,
+        #         "callback": Callback.Button.callback_exit,
+        #         "row": 1
+        #     }
+        # }
 
-        remove_btn: BtnAttr = {
-            True: {
-                "label": "🗑️",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_remove,
-                "row": 1
-            },
-            False: {
-                "label": "🗑️",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_remove,
-                "row": 1
-            }
-        }
+        # deprecated 2023-02-24
+        #
+        # reset_btn: BtnAttr = {
+        #     True: {
+        #         "label": "🔄️",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": False,
+        #         "callback": Callback.Button.callback_reset,
+        #         "row": 1
+        #     },
+        #     False: {
+        #         "label": "🔄️",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": False,
+        #         "callback": Callback.Button.callback_reset,
+        #         "row": 1
+        #     }
+        # }
 
-        playlist_btn: BtnAttr = {
-            True: {
-                "label": "📜",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_haevy_playlist,
-                "row": 1
-            },
-            False: {
-                "label": "📜",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_haevy_playlist,
-                "row": 1
-            }
-        }        
+        # refresh_btn: BtnAttr = {
+        #     True: {
+        #         "label": "🛠️",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": True,
+        #         "callback": Callback.Button.callback_refresh,
+        #         "row": 1
+        #     },
+        #     False: {
+        #         "label": "🛠️",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": True,
+        #         "callback": Callback.Button.callback_refresh,
+        #         "row": 1
+        #     }
+        # }
 
-        exit_btn: BtnAttr = {
-            True: {
-                "label": "⏹️",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_exit,
-                "row": 1
-            },
-            False: {
-                "label": "⏹️",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_exit,
-                "row": 1
-            }
-        }
+        # remove_btn: BtnAttr = {
+        #     True: {
+        #         "label": "🗑️",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": False,
+        #         "callback": Callback.Button.callback_remove,
+        #         "row": 1
+        #     },
+        #     False: {
+        #         "label": "🗑️",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": False,
+        #         "callback": Callback.Button.callback_remove,
+        #         "row": 1
+        #     }
+        # }
 
-        reset_btn: BtnAttr = {
-            True: {
-                "label": "🔄️",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_reset,
-                "row": 1
-            },
-            False: {
-                "label": "🔄️",
-                "style": ButtonStyle.secondary,
-                "disabled": False,
-                "callback": Callback.Button.callback_reset,
-                "row": 1
-            }
-        }
+        # playlist_btn: BtnAttr = {
+        #     True: {
+        #         "label": "📜",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": False,
+        #         "callback": Callback.Button.callback_haevy_playlist,
+        #         "row": 1
+        #     },
+        #     False: {
+        #         "label": "📜",
+        #         "style": ButtonStyle.secondary,
+        #         "disabled": False,
+        #         "callback": Callback.Button.callback_haevy_playlist,
+        #         "row": 1
+        #     }
+        # }  
 
 
         @classmethod
@@ -1052,11 +1061,13 @@ class Generator(Block.Instanctiating):
             buttons.append(cls.skip_btn.get(player.is_last_audio))
             buttons.append(cls.loop_btn.get(player.loop_mode))
             
-            buttons.append(cls.reset_btn.get(True))
-            buttons.append(cls.remove_btn.get(True))
-            buttons.append(cls.playlist_btn.get(True))
-            buttons.append(cls.exit_btn.get(True))
-            buttons.append(cls.refresh_btn.get(True))
+            # deprecated 2023-02-24
+            #
+            # buttons.append(cls.reset_btn.get(True))
+            # buttons.append(cls.exit_btn.get(True))
+            # buttons.append(cls.remove_btn.get(True))
+            # buttons.append(cls.playlist_btn.get(True))
+            # buttons.append(cls.refresh_btn.get(True))
 
             return tuple(buttons)
  

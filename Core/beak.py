@@ -165,7 +165,7 @@ class Beak(metaclass=Singleton):
         if guild_player.is_connected:
             await guild_player.voice_client.disconnect()
 
-        self.__discard_player(ctx=ctx, guild_id=guild_id, guild_player=guild_player)
+        await self.__discard_player(ctx=ctx, guild_id=guild_id, guild_player=guild_player)
 
 
     async def beak_play(self, ctx: Context, URL: str) -> None:
@@ -184,8 +184,6 @@ class Beak(metaclass=Singleton):
                 return
                 
             await self.beak_enter(ctx=ctx)
-
-        audios = await self.extract(ctx=ctx, URL=URL)
 
         try:
             audios = await self.extract(ctx=ctx, URL=URL)
