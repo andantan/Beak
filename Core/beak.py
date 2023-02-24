@@ -252,4 +252,5 @@ class Beak(metaclass=Singleton):
                     await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
         else:
-            await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx)     
+            await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx) 
+            await self.beak_exit(ctx=ctx)    

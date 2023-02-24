@@ -474,70 +474,74 @@ class BeakNotification(Block.Instanctiating):
                     2: "한곡 반복"
                 }
 
-                if player.is_ended:
-                    _embed = Embed(
-                        title = "음원이 모두 재생되었습니다.", 
-                        description = f"재생된 음원 수: {len(player.reference_overqueue)}개",
-                        color = ATTACHED_PLAYLIST_EMBED_COLOR
-                    )
+                # if player.is_ended:
+                    # deprecated 2023-02-24
+                    # Releases: v3.1.18-alpha
+                    # Notes: No more waiting until enqueuing audio
+                    #
+                    # _embed = Embed(
+                    #     title = "음원이 모두 재생되었습니다.", 
+                    #     description = f"재생된 음원 수: {len(player.reference_overqueue)}개",
+                    #     color = ATTACHED_PLAYLIST_EMBED_COLOR
+                    # )
 
-                    _embed.set_author(name=f"🤩 \"{player.channel_name}\"에서 재생 완료 🤩")
+                    # _embed.set_author(name=f"🤩 \"{player.channel_name}\"에서 재생 완료 🤩")
 
-                    _embed.add_field(name="재생 상태", value="재생 종료", inline=False)
-
-
-                    prev_audio_value = "음원을 추가해주세요." \
-                                        if player.is_overqueue_empty \
-                                        else player.seek_overqueue.get("title")
-
-
-                    _embed.add_field(name="이전 음원", value=prev_audio_value, inline=False)
-                    _embed.add_field(name="다음 음원", value="음원을 추가해주세요.", inline=False)
-
-                    _embed.set_footer(text="Beak by Qbean")
-
-                    return _embed
-
-                else:
-                    guild_now_playing: Dict[str, str] = player.reference_queue.__getitem__(0)
-
-                    timedelta_message = f"{datetime.timedelta(seconds=guild_now_playing.get('duration'))}"
-
-                    prev_audio_value = "첫 번째 음원입니다." \
-                                        if player.is_overqueue_empty \
-                                        else player.seek_overqueue.get("title")
-
-                    next_audio_value = player.reference_queue.__getitem__(1).get("title") \
-                                        if player.is_queue_two_or_more \
-                                        else "마지막 음원입니다."
-
-                    waiting_value = "∞" if player.is_loop_mode else f"{len(player.reference_queue) - 1}개"
+                    # _embed.add_field(name="재생 상태", value="재생 종료", inline=False)
 
 
-                    _embed = Embed(
-                        title = guild_now_playing.get("title"),
-                        url = guild_now_playing.get("original_url"),
-                        description = guild_now_playing.get("uploader"),
-                        color = ATTACHED_PLAYLIST_EMBED_COLOR
-                    )
+                    # prev_audio_value = "음원을 추가해주세요." \
+                    #                     if player.is_overqueue_empty \
+                    #                     else player.seek_overqueue.get("title")
 
-                    _embed.set_author(name=f"🤩 \"{player.channel_name}\"에서 재생 중 🤩")
 
-                    _embed.set_thumbnail(
-                        url = guild_now_playing.get("thumbnail")
-                    )
+                    # _embed.add_field(name="이전 음원", value=prev_audio_value, inline=False)
+                    # _embed.add_field(name="다음 음원", value="음원을 추가해주세요.", inline=False)
 
-                    _embed.add_field(name="음원 길이", value=timedelta_message, inline=True)
-                    _embed.add_field(name="재생 상태", value=mode_value.get(player.is_paused), inline=True)
-                    _embed.add_field(name="재생 모드", value=loop_value.get(player.loop_mode), inline=True)
+                    # _embed.set_footer(text="Beak by Qbean")
 
-                    _embed.add_field(name="이전 음원", value=prev_audio_value, inline=False)
-                    _embed.add_field(name="다음 음원", value=next_audio_value, inline=False)
-                    _embed.add_field(name="대기 중인 음원 수", value=waiting_value, inline=False)
-                    
-                    _embed.set_footer(text="Beak by Qbean")
+                    # return _embed
 
-                    return _embed
+                # else:
+                guild_now_playing: Dict[str, str] = player.reference_queue.__getitem__(0)
+
+                timedelta_message = f"{datetime.timedelta(seconds=guild_now_playing.get('duration'))}"
+
+                prev_audio_value = "첫 번째 음원입니다." \
+                                    if player.is_overqueue_empty \
+                                    else player.seek_overqueue.get("title")
+
+                next_audio_value = player.reference_queue.__getitem__(1).get("title") \
+                                    if player.is_queue_two_or_more \
+                                    else "마지막 음원입니다."
+
+                waiting_value = "∞" if player.is_loop_mode else f"{len(player.reference_queue) - 1}개"
+
+
+                _embed = Embed(
+                    title = guild_now_playing.get("title"),
+                    url = guild_now_playing.get("original_url"),
+                    description = guild_now_playing.get("uploader"),
+                    color = ATTACHED_PLAYLIST_EMBED_COLOR
+                )
+
+                _embed.set_author(name=f"🤩 \"{player.channel_name}\"에서 재생 중 🤩")
+
+                _embed.set_thumbnail(
+                    url = guild_now_playing.get("thumbnail")
+                )
+
+                _embed.add_field(name="음원 길이", value=timedelta_message, inline=True)
+                _embed.add_field(name="재생 상태", value=mode_value.get(player.is_paused), inline=True)
+                _embed.add_field(name="재생 모드", value=loop_value.get(player.loop_mode), inline=True)
+
+                _embed.add_field(name="이전 음원", value=prev_audio_value, inline=False)
+                _embed.add_field(name="다음 음원", value=next_audio_value, inline=False)
+                _embed.add_field(name="대기 중인 음원 수", value=waiting_value, inline=False)
+                
+                _embed.set_footer(text="Beak by Qbean")
+
+                return _embed
 
 
             @staticmethod
