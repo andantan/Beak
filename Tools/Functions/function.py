@@ -23,7 +23,9 @@ from Data.Paraments.settings import (
     COMMANDER_NOTICE_EMBED_COLOR,
     NOTICE_EMBED_COLOR,
     ATTACHED_PLAYLIST_EMBED_COLOR,
-    ENDED_PLAYLIST_NOTICE_COLOR
+    ENDED_PLAYLIST_NOTICE_COLOR,
+    QUEUE_THRESHOLD,
+    OVER_QUEUE_THRESHOLD
 )
 
 
@@ -87,7 +89,7 @@ class Callback(Block.Instanctiating):
                     await BeakNotification.Playlist.deploy(player=guild_player)
 
             else:
-                BeakNotification.Error.notice_last_audio(metadata=interaction)
+                await BeakNotification.Error.notice_last_audio(metadata=interaction)
 
 
         @staticmethod
@@ -795,6 +797,17 @@ class BeakNotification(Block.Instanctiating):
         async def notice_empty_voice_channel(metadata: Metadata) -> None:
             values = {
                 "title" : "빈 음성 채널이 감지되었습니다.",
+                "color" : ENDED_PLAYLIST_NOTICE_COLOR
+            }
+
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
+
+
+        @staticmethod
+        async def notice_saturated_queue(metadata: Metadata) -> None:
+            values = {
+                "title" : f"대기열이 가득찼습니다. (최대 대기가능 음원 수: {QUEUE_THRESHOLD})",
+                "description": f"{QUEUE_THRESHOLD}번 째 다음 음원은 모두 자동 삭제됩니다.",
                 "color" : ENDED_PLAYLIST_NOTICE_COLOR
             }
 

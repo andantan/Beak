@@ -13,7 +13,9 @@ from Class.superclass import Block
 
 from Data.Paraments.settings import (
     DSC_NOTICE_EMBED_COLOR,
-    DSC_DEFAULT_DELAY
+    DSC_DEFAULT_DELAY,
+    QUEUE_THRESHOLD,
+    OVER_QUEUE_THRESHOLD
 )
 
 
@@ -118,8 +120,19 @@ class Logger(Block.Instanctiating):
         @staticmethod
         async def notice_unallocated_guild_id(metadata: Metadata, ero: Exception) -> None:
             values = {
-                "title" : f"{ero.__class__}", 
+                "title" : f"DSC executed: {ero.__class__}", 
                 "description" : f"Unallocated guild id({metadata.guild.id})",
+                "color" : DSC_NOTICE_EMBED_COLOR
+            }
+
+            await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values)
+
+
+        @staticmethod
+        async def notice_saturated_queue(metadata: Metadata, ero: Exception) -> None:
+            values = {
+                "title" : f"DSC executed: {ero.__class__}", 
+                "description" : f"The queue has been saturated(THRESHOLD: {QUEUE_THRESHOLD})",
                 "color" : DSC_NOTICE_EMBED_COLOR
             }
 

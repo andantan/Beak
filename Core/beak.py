@@ -184,18 +184,15 @@ class Beak(metaclass=Singleton):
 
         try:
             guild_player = self.__get_guild_player(guild_id)
+            guild_player.enqueue(audios=audios)
 
         except BeakError.UnallocatedIdentificationError as e:
             # TODO: Handling this section
             await Logger.EmbedNotification.notice_unallocated_guild_id(metadata=ctx, ero=e)
-    
-
-        try:
-            guild_player.enqueue(audios=audios)
 
         except AsyncQueueErrors.QueueSaturatedErorr:
             # TODO: Handling this section
-            pass
+            await BeakNotification.Playlist.notice_saturated_queue(metadata=ctx)
 
         except Exception as e:
             print(e)
