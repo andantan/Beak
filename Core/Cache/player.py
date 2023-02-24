@@ -246,7 +246,7 @@ class Player:
         try:
             self.QUEUE.enqueue(attached_queue)
         
-        except AsyncQueueErrors.QueueSaturatedErorr as throwable:
+        except AsyncQueueError.SaturatedQueueError as throwable:
             raise throwable
 
     
