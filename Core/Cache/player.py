@@ -75,6 +75,8 @@ class Player:
     @property
     def is_activated(self) -> bool: return self.VOICECLIENT.is_connected() and self.VOICECLIENT.is_playing()
     @property
+    def is_queued(self) -> bool: return self.VOICECLIENT.is_paused() or self.VOICECLIENT.is_playing()
+    @property
     def is_first_audio(self) -> bool: return self.OVERQUEUE.is_empty()
     @property
     def is_last_audio(self) -> bool: return self.QUEUE.is_single()

@@ -474,35 +474,38 @@ class BeakNotification(Block.Instanctiating):
                     2: "한곡 반복"
                 }
 
+                # deprecatd 2023-02-24
+                
                 # if player.is_ended:
-                    # deprecated 2023-02-24
-                    # Releases: v3.1.18-alpha
-                    # Notes: No more waiting until enqueuing audio
-                    #
-                    # _embed = Embed(
-                    #     title = "음원이 모두 재생되었습니다.", 
-                    #     description = f"재생된 음원 수: {len(player.reference_overqueue)}개",
-                    #     color = ATTACHED_PLAYLIST_EMBED_COLOR
-                    # )
+                #     deprecated 2023-02-24
+                #     Releases: v3.1.18-alpha
+                #     Notes: No more waiting until enqueuing audio
+                    
+                #     _embed = Embed(
+                #         title = "음원이 모두 재생되었습니다.", 
+                #         description = f"재생된 음원 수: {len(player.reference_overqueue)}개",
+                #         color = ATTACHED_PLAYLIST_EMBED_COLOR
+                #     )
 
-                    # _embed.set_author(name=f"🤩 \"{player.channel_name}\"에서 재생 완료 🤩")
+                #     _embed.set_author(name=f"🤩 \"{player.channel_name}\"에서 재생 완료 🤩")
 
-                    # _embed.add_field(name="재생 상태", value="재생 종료", inline=False)
-
-
-                    # prev_audio_value = "음원을 추가해주세요." \
-                    #                     if player.is_overqueue_empty \
-                    #                     else player.seek_overqueue.get("title")
+                #     _embed.add_field(name="재생 상태", value="재생 종료", inline=False)
 
 
-                    # _embed.add_field(name="이전 음원", value=prev_audio_value, inline=False)
-                    # _embed.add_field(name="다음 음원", value="음원을 추가해주세요.", inline=False)
+                #     prev_audio_value = "음원을 추가해주세요." \
+                #                         if player.is_overqueue_empty \
+                #                         else player.seek_overqueue.get("title")
 
-                    # _embed.set_footer(text="Beak by Qbean")
 
-                    # return _embed
+                #     _embed.add_field(name="이전 음원", value=prev_audio_value, inline=False)
+                #     _embed.add_field(name="다음 음원", value="음원을 추가해주세요.", inline=False)
+
+                #     _embed.set_footer(text="Beak by Qbean")
+
+                #     return _embed
 
                 # else:
+
                 guild_now_playing: Dict[str, str] = player.reference_queue.__getitem__(0)
 
                 timedelta_message = f"{datetime.timedelta(seconds=guild_now_playing.get('duration'))}"
@@ -526,15 +529,10 @@ class BeakNotification(Block.Instanctiating):
                 )
 
                 _embed.set_author(name=f"🤩 \"{player.channel_name}\"에서 재생 중 🤩")
-
-                _embed.set_thumbnail(
-                    url = guild_now_playing.get("thumbnail")
-                )
-
+                _embed.set_thumbnail(url = guild_now_playing.get("thumbnail"))
                 _embed.add_field(name="음원 길이", value=timedelta_message, inline=True)
                 _embed.add_field(name="재생 상태", value=mode_value.get(player.is_paused), inline=True)
                 _embed.add_field(name="재생 모드", value=loop_value.get(player.loop_mode), inline=True)
-
                 _embed.add_field(name="이전 음원", value=prev_audio_value, inline=False)
                 _embed.add_field(name="다음 음원", value=next_audio_value, inline=False)
                 _embed.add_field(name="대기 중인 음원 수", value=waiting_value, inline=False)
@@ -714,23 +712,23 @@ class BeakNotification(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_playlist_is_ended(ctx: Context):
+        async def notice_playlist_is_ended(metadata: Metadata):
             values = {
                 "title" : "플레이리스트가 모두 재생되었습니다.", 
                 "color" : ENDED_PLAYLIST_NOTICE_COLOR
             }
 
-            await BeakNotification.Default.notice_default_embed(metadata=ctx, **values)
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
 
 
         @staticmethod
-        async def notice_looping(ctx: Context):
+        async def notice_looping(metadata: Metadata):
             values = {
                 "title" : "전체 반복 재생 모드로 이전 재생 목록을 재생 대기열로 옮깁니다.", 
                 "color" : ENDED_PLAYLIST_NOTICE_COLOR
             }
 
-            await BeakNotification.Default.notice_default_embed(metadata=ctx, **values)
+            await BeakNotification.Default.notice_default_embed(metadata=metadata, **values)
 
 
         @staticmethod

@@ -82,14 +82,22 @@ class Beak(metaclass=Singleton):
         
         except ValueError:
             raise BeakError.UnallocatedIdentificationError
+        
+    
+    async def __discard_player(self, ctx: Context, guild_id: int, guild_player: Player) -> None:
+        await BeakNotification.Playlist.discard(metadata=ctx, player=guild_player)
+
+        self.__discard_pool__(guild_id=guild_id)
 
     
     def DSC_get_guild_player(self, guild_id) ->Optional[Player]:
         raise NotImplementedError
 
 
-    def is_beak_already_entered_channel(self, guild_id: int) -> bool:
-        return guild_id in self.player_pool
+    # deprecated 2023-02-24
+    #
+    # def is_beak_already_entered_channel(self, guild_id: int) -> bool:
+    #     return guild_id in self.player_pool
 
 
     async def __ytdl_executor(self, URL: str, Debug=False) -> List[Dict[str, str]]:
@@ -158,9 +166,7 @@ class Beak(metaclass=Singleton):
         if guild_player.is_connected:
             await guild_player.voice_client.disconnect()
 
-        await BeakNotification.Playlist.discard(metadata=ctx, player=guild_player)
-
-        self.__discard_pool__(guild_id=guild_id)
+        self.__discard_player(ctx=ctx, guild_id=guild_id, guild_player=guild_player)
 
 
     async def beak_play(self, ctx: Context, URL: str) -> None:
@@ -183,8 +189,12 @@ class Beak(metaclass=Singleton):
         audios = await self.extract(ctx=ctx, URL=URL)
 
         try:
+            audios = await self.extract(ctx=ctx, URL=URL)
+
             guild_player = self.__get_guild_player(guild_id)
             guild_player.enqueue(audios=audios)
+
+            await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
         except BeakError.UnallocatedIdentificationError as e:
             # TODO: Handling this section
@@ -197,30 +207,24 @@ class Beak(metaclass=Singleton):
         except Exception as e:
             print(e)
 
-        await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
-    
-        if guild_player.is_playing or guild_player.is_paused:
-            return
+        if guild_player.is_playing or guild_player.is_paused: return
 
         while not guild_player.is_queue_empty:
             audio_source_url = guild_player.seek_queue.get("audio_url")
             
             try:
                 guild_player.voice_client.play(FFmpegPCMAudio(audio_source_url, **FFMPEG_OPTION))
-        
+
+                await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
+
             except discord.errors.ClientException:
-                await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx)
+                await BeakNotification.Playlist.notice_playlist_is_ended(metadata=ctx)
 
                 return
 
-
-            await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
-
             while guild_player.is_playing or guild_player.is_paused:
                 if not guild_player.is_connected:
-                    await BeakNotification.Playlist.discard(metadata=ctx, player=guild_player)
-
-                    self.__discard_pool__(guild_id=guild_id)
+                    await self.__discard_player(ctx=ctx, guild_id=guild_id, guild_player=guild_player)
                     
                     return
 
@@ -231,26 +235,23 @@ class Beak(metaclass=Singleton):
                     if guild_player.is_voice_channel_empty:
                         await self.beak_exit(ctx=ctx)
                         
-                        # deprecated 2023-02-21
-                        # await BeakNotification.Playlist.notice_empty_voice_channel(metadata=ctx)
-                        
                         return
 
                     if not guild_player.is_repeat_mode:
                         try:
                             guild_player.dequeue()
 
+                            if guild_player.is_loop_mode and guild_player.is_queue_empty:
+                                guild_player.looping()
+
+                                await BeakNotification.Playlist.notice_looping(metadata=ctx)
+
                         except AsyncQueueErrors.OverQueueSaturatedErorr:
                             # TODO: Handling this section
                             pass
 
-                        if guild_player.is_loop_mode and guild_player.is_queue_empty:
-                            guild_player.looping()
-
-                            await BeakNotification.Playlist.notice_looping(ctx=ctx)
-
                     await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
         else:
-            await BeakNotification.Playlist.notice_playlist_is_ended(ctx=ctx) 
+            await BeakNotification.Playlist.notice_playlist_is_ended(metadata=ctx) 
             await self.beak_exit(ctx=ctx)    

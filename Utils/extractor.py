@@ -35,10 +35,8 @@ class YoutubeDlExtractor(Block.Instanctiating):
             print(ERO)
             loop.close()
 
-        if DEBUG:
-            return extracted_data
-
-        return YoutubeDlExtractor.summarize(extracted_data, URL)
+        if DEBUG: return extracted_data
+        else: return YoutubeDlExtractor.summarize(extracted_data, URL)
 
 
     def summarize(extracted_data: Dict[str, Any], URL: str) -> List[Dict[str, str]]:
