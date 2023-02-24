@@ -11,6 +11,8 @@ from discord.ext.commands.context import Context, Message
 
 from Class.superclass import Singleton
 
+from Admin.DSC.dsc import DSC
+
 from Core.Cache.pool import PlayerPool
 from Core.Cache.player import Player
 from Core.Cache.storage import Storage
@@ -58,6 +60,7 @@ class Beak(metaclass=Singleton):
             # )
 
             raise BeakErrors.AllocationError
+
         
         _player = Player(
             voice_client = voice_client,
@@ -94,20 +97,23 @@ class Beak(metaclass=Singleton):
         
         return data
 
-    
-
 
 
     async def beak_enter(self, ctx: Context) -> None:
-        try:
-            guild_id = ContextExtractor.get_guild_id(ctx=ctx)
-            voice_channel = ContextExtractor.get_author_entered_voice_channel(ctx)
-            voice_client = await voice_channel.connect(self_deaf=True)
+        guild_id = ContextExtractor.get_guild_id(ctx=ctx)
+        voice_channel = ContextExtractor.get_author_entered_voice_channel(ctx=ctx)
+        voice_client = await voice_channel.connect(self_deaf=True)
 
+        try:
             self.__alloc_pool__(guild_id=guild_id, voice_client=voice_client)
             
         except BeakErrors.AllocationError:
-            pass
+            await DSC.Controller.dismantle_player(
+                identification=guild_id, 
+                player=self.player_pool.__getitem__(guild_id=guild_id)
+            )
+
+            DSC.Controller.allocate_player(identification=guild_id, voice_client=voice_client)          
  
 
     async def beak_exit(self, ctx: Context) -> None:
