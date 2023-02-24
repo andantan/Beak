@@ -19,7 +19,7 @@ from Core.Cache.storage import Storage
 from Core.Cache.Queue.queue import AsyncQueue
 from Core.Cache.Queue.Errors.queue_error import AsyncQueueErrors
 
-from Core.Errors.error import *
+from Core.Errors.error import BeakError
 
 from Tools.Functions.function import BeakNotification
 
@@ -59,7 +59,7 @@ class Beak(metaclass=Singleton):
             #     is_msg_saved = player.is_message_saved
             # )
 
-            raise AllocatedIdentificationError
+            raise BeakError.AllocatedIdentificationError
 
         
         _player = Player(
@@ -81,7 +81,7 @@ class Beak(metaclass=Singleton):
             return self.player_pool.__getitem__(guild_id)
         
         except ValueError:
-            raise UnallocatedIdentificationError
+            raise BeakError.UnallocatedIdentificationError
 
     
     def DSC_get_guild_player(self, guild_id) ->Optional[Player]:
@@ -98,7 +98,7 @@ class Beak(metaclass=Singleton):
         return data
 
 
-    async def __notice_extract_info(self, ctx: Context, URL: str) -> List[Dict[str, str]]:
+    async def extract(self, ctx: Context, URL: str) -> List[Dict[str, str]]:
         __em: Optional[Message] = None
         
         if "playlist" in URL:
@@ -141,7 +141,7 @@ class Beak(metaclass=Singleton):
         try:
             self.__alloc_pool__(guild_id=guild_id, voice_client=voice_client)
             
-        except AllocatedIdentificationError:
+        except BeakError.AllocatedIdentificationError:
             await DSC.Controller.dismantle_player(
                 identification=guild_id, 
                 player=self.player_pool.__getitem__(guild_id=guild_id)
@@ -180,12 +180,12 @@ class Beak(metaclass=Singleton):
                 
             await self.beak_enter(ctx=ctx)
 
-        audios = await self.__notice_extract_info(ctx=ctx, URL=URL)
+        audios = await self.extract(ctx=ctx, URL=URL)
 
         try:
             guild_player = self.__get_guild_player(guild_id)
 
-        except UnallocatedIdentificationError as e:
+        except BeakError.UnallocatedIdentificationError as e:
             # TODO: Handling this section
             await Logger.EmbedNotification.notice_unallocated_guild_id(metadata=ctx, ero=e)
     

@@ -5,7 +5,7 @@ from typing import (
 
 import random
 
-from Core.Cache.Queue.Errors.queue_error import AsyncQueueErrors
+from Core.Errors.error import AsyncQueueError
 
 from Class.superclass import Block
 
@@ -27,10 +27,7 @@ class AsyncQueue(Block.Instanctiating):
         def enqueue(self, overplayed_audios: List[Dict[str, str]]) -> None:
             for overplayed_audio in overplayed_audios:
                 if len(self.overplayed_playlist) == OVER_QUEUE_THRESHOLD:
-                    raise AsyncQueueErrors.OverQueueSaturatedErorr(
-                        THRESHOLD = OVER_QUEUE_THRESHOLD,
-                        queue_length = len(self.overplayed_playlist)
-                    )
+                    raise AsyncQueueError.SaturatedOverQueueError
 
                 self.overplayed_playlist.append(overplayed_audio)
 
@@ -92,10 +89,7 @@ class AsyncQueue(Block.Instanctiating):
 
     
     class Queue:
-        __slots__ = (
-            "playlist"
-        )
-
+        __slots__ = ("playlist", )
 
         def __init__(self) -> None:
             self.playlist: List[Dict[str, str]] = list()
@@ -104,10 +98,7 @@ class AsyncQueue(Block.Instanctiating):
         def enqueue(self, audios: List[Dict[str, str]]) -> None:
             for audio in audios:
                 if len(self.playlist) == QUEUE_THRESHOLD:
-                    raise AsyncQueueErrors.QueueSaturatedErorr(
-                        THRESHOLD = QUEUE_THRESHOLD,
-                        queue_length = len(self.playlist)
-                    )
+                    raise AsyncQueueError.SaturatedQueueError
 
                 self.playlist.append(audio)
 
