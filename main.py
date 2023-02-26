@@ -57,9 +57,18 @@ async def on_ready():
     await bot.change_presence(status=discord.Status.online)
 
     if PATCHING:
-        await bot.change_presence(activity=discord.Game(name=f"패치 중"))
+        await bot.change_presence(
+            activity = discord.Game(
+            name = f"업데이트(버전: {__version__})"
+            )
+        )
     else:
-        await bot.change_presence(activity=discord.Game(name=f"{DEFAULT_COMMAND_PREFIX}도움말"))
+        await bot.change_presence(
+            activity = discord.Activity(
+                type = discord.ActivityType.listening,
+                name = f"{DEFAULT_COMMAND_PREFIX}도움"
+            )
+        )
 
     Storage.Identification().set_beak_id(bot.user.id)
     Storage.Identification().set_admin_ids(administrator_identifications)
@@ -83,13 +92,14 @@ async def bplay(ctx: Context, *args) -> None:
     await ctx.message.delete()
 
     if PATCHING:
-        await beak.beak_patching(
-            ctx=ctx, 
-            prev_version=__version__, 
-            updated_version=__patch_version__
-        )
+        if not Storage.Identification().is_admin(ctx.author.id):
+            await beak.beak_patching(
+                ctx=ctx, 
+                prev_version=__version__, 
+                updated_version=__patch_version__
+            )
 
-        return
+            return
 
     if len(args) == 0:
         await CommandNotification.Error.notice_missing_required_arguments(ctx=ctx)
@@ -121,13 +131,14 @@ async def breset(ctx: Context) -> None:
     await ctx.message.delete()
 
     if PATCHING:
-        await beak.beak_patching(
-            ctx=ctx, 
-            prev_version=__version__, 
-            updated_version=__patch_version__
-        )
+        if not Storage.Identification().is_admin(ctx.author.id):
+            await beak.beak_patching(
+                ctx=ctx, 
+                prev_version=__version__, 
+                updated_version=__patch_version__
+            )
 
-        return
+            return
 
     await beak.beak_player_reset(ctx=ctx)
 
@@ -137,13 +148,14 @@ async def bexit(ctx: Context) -> None:
     await ctx.message.delete()
 
     if PATCHING:
-        await beak.beak_patching(
-            ctx=ctx, 
-            prev_version=__version__, 
-            updated_version=__patch_version__
-        )
+        if not Storage.Identification().is_admin(ctx.author.id):
+            await beak.beak_patching(
+                ctx=ctx, 
+                prev_version=__version__, 
+                updated_version=__patch_version__
+            )
 
-        return
+            return
 
     await beak.beak_player_exit(ctx=ctx)
 
@@ -154,13 +166,14 @@ async def bhelp(ctx: Context) -> None:
     await ctx.message.delete()
 
     if PATCHING:
-        await beak.beak_patching(
-            ctx=ctx, 
-            prev_version=__version__, 
-            updated_version=__patch_version__
-        )
+        if not Storage.Identification().is_admin(ctx.author.id):
+            await beak.beak_patching(
+                ctx=ctx, 
+                prev_version=__version__, 
+                updated_version=__patch_version__
+            )
 
-        return
+            return
 
     embed = discord.Embed(
         title="🐼 재생 명령어 🐼", 
