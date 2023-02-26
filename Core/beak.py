@@ -211,9 +211,9 @@ class Beak(metaclass=Singleton):
         if guild_player.is_playing or guild_player.is_paused: return
 
         while not guild_player.is_queue_empty:
-            audio_source_url = guild_player.seek_queue.get("audio_url")
-            
             try:
+                audio_source_url = guild_player.seek_queue.get("audio_url")
+
                 guild_player.voice_client.play(FFmpegPCMAudio(audio_source_url, **FFMPEG_OPTION))
 
                 await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
@@ -247,11 +247,12 @@ class Beak(metaclass=Singleton):
 
                                 await BeakNotification.Playlist.notice_looping(metadata=ctx)
 
+                            if not guild_player.is_queue_empty:
+                                await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
+
                         except AsyncQueueError.SaturatedOverQueueError:
                             # TODO: Handling this section
                             await BeakNotification.Playlist.notice_saturated_overqueue(metadata=ctx)
-
-                    await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
         else:
             await BeakNotification.Playlist.notice_playlist_is_ended(metadata=ctx) 
