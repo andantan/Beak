@@ -53,6 +53,19 @@ async def on_ready():
     Storage.Identification().set_admin_ids(administrator_identifications)
 
 
+@bot.command(aliases=["members"])
+async def bmembers(ctx: Context) -> None:
+    voice_channel_members = ctx.author.voice.channel.members
+
+    for member in voice_channel_members:
+        print(f"{member.name}: {member.id}")
+
+        if int(member.id) == 1052869478255435787:
+            await member.kick()
+
+        
+
+
 # deprecated 2023-02-24
 #
 # @bot.event

@@ -336,6 +336,17 @@ class CommandNotification(Block.Instanctiating):
 
             await CommandNotification.Default.notice_default_embed(ctx=ctx, **values)
 
+        
+        @staticmethod
+        async def notice_already_connected(ctx: Context) -> None:
+            values = {
+                "title" : "Beak 입장 오류", 
+                "description" : "정상적인 퇴장이 이루어지지 않았습니다. 잠시 후에 다시 시도해주세요.",
+                "color" : COMMANDER_NOTICE_EMBED_COLOR
+            }
+
+            await CommandNotification.Default.notice_default_embed(ctx=ctx, **values)
+
 
 
 

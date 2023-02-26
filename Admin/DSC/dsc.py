@@ -1,7 +1,8 @@
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union, Optional, Any
 
 from discord import Embed
 from discord.voice_client import VoiceClient
+from discord.channel import VoiceChannel, StageChannel
 from discord.ext.commands.context import Context, Interaction
 
 from Core.Cache.pool import PlayerPool
@@ -20,9 +21,10 @@ from Data.Paraments.settings import (
 
 
 Metadata = Union[Context, Interaction]
-EmbedFields = List[Dict[str, str]]
+EmbedFields = List[Dict[str, Union[str, Any]]]
 EmbedValues = Dict[str, str]
-
+VoiceStreamChannel = Union[VoiceChannel, StageChannel, None]
+ 
 class DSC(Block.Instanctiating):
     class Debugger(Block.Instanctiating):
         ...
@@ -57,7 +59,7 @@ class DSC(Block.Instanctiating):
                     await pl.voice_client.disconnect()
 
                 pl.queue.clear(on_air=False)
-                pl.overqueue_length.clear()
+                pl.over_queue.clear()
                 pl.message_storage.clear()
             
             if not isinstance(identification, int):
@@ -69,6 +71,11 @@ class DSC(Block.Instanctiating):
             await __vacate_player(pl=player)
 
             PlayerPool().__delitem__(guild_id=identification)
+
+
+        @staticmethod
+        async def connect_client(channel: VoiceStreamChannel) -> VoiceClient:
+            _vc = await channel.connect()
 
 
         @staticmethod
@@ -102,11 +109,16 @@ class Logger(Block.Instanctiating):
                 _k = ["name", "value", "inline"]
 
                 for field in fields:
+                    
                     for key in _k:
                         if not key in field:
                             break
 
-                    _embed.add_field(**field)
+                    _embed.add_field(
+                        name=field.get("name"),
+                        value=field.get("value"),
+                        inline=field.get("inline")
+                    )
 
             _embed.set_footer(text="Beak-DSC by Qbean")
 
@@ -120,18 +132,28 @@ class Logger(Block.Instanctiating):
         @staticmethod
         async def notice_unallocated_guild_id(metadata: Metadata, ero: Exception) -> None:
             values = {
-                "title" : f"DSC executed: {ero.__class__}", 
-                "description" : f"Unallocated guild id({metadata.guild.id})",
+                "title" : f"DSC activated", 
+                "description" : f"Detected {ero.__class__.__name__} - Unallocated guild id({metadata.guild.id})",
                 "color" : DSC_NOTICE_EMBED_COLOR
             }
 
-            await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values)
+            field = {
+                "name": "Controller executed",
+                "value": f"Fetching Controller.allocate_player",
+                "inline": False
+            }
+
+            fields = [
+                field
+            ]
+
+            await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values, fields=fields)
 
 
         @staticmethod
         async def notice_saturated_queue(metadata: Metadata, ero: Exception) -> None:
             values = {
-                "title" : f"DSC executed: {ero.__class__}", 
+                "title" : f"DSC executed: {ero.__class__.__name__}", 
                 "description" : f"The queue has been saturated(THRESHOLD: {QUEUE_THRESHOLD})",
                 "color" : DSC_NOTICE_EMBED_COLOR
             }

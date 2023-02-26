@@ -20,7 +20,7 @@ from Core.Cache.Queue.queue import AsyncQueue
 
 from Core.Errors.error import BeakError, AsyncQueueError
 
-from Tools.Functions.function import BeakNotification
+from Tools.Functions.function import BeakNotification, CommandNotification
 
 from Utils.extractor import (
     ContextExtractor,
@@ -143,10 +143,14 @@ class Beak(metaclass=Singleton):
     async def beak_enter(self, ctx: Context) -> None:
         guild_id = ContextExtractor.get_guild_id(ctx=ctx)
         voice_channel = ContextExtractor.get_author_entered_voice_channel(ctx=ctx)
-        voice_client = await voice_channel.connect(self_deaf=True)
-
+    
         try:
+            voice_client = await voice_channel.connect(self_deaf=True)
+
             self.__alloc_pool__(guild_id=guild_id, voice_client=voice_client)
+
+        except discord.errors.ClientException:
+            await CommandNotification.Error.notice_already_connected(ctx=ctx)
             
         except BeakError.AllocatedIdentificationError:
             await DSC.Controller.dismantle_player(
@@ -154,7 +158,7 @@ class Beak(metaclass=Singleton):
                 player=self.player_pool.__getitem__(guild_id=guild_id)
             )
 
-            DSC.Controller.allocate_player(identification=guild_id, voice_client=voice_client)          
+            DSC.Controller.allocate_player(identification=guild_id, voice_client=voice_client)        
  
 
     async def beak_exit(self, ctx: Context) -> None:
