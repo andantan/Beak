@@ -9,7 +9,7 @@ from discord import Embed, FFmpegPCMAudio
 from discord.voice_client import VoiceClient
 from discord.ext.commands.context import Context, Message
 
-from Class.superclass import Singleton
+from Class.superclass import *
 
 from Admin.DSC.dsc import DSC, Logger
 
@@ -33,6 +33,37 @@ from Data.Paraments.settings import (
     SLEEP_TIME,
     FFMPEG_OPTION
 )
+
+
+class BeakInspector(Block.Instanctiating):
+    @staticmethod
+    def coro_commander_inspection():
+        def _decof(func):
+            async def wrapper(*args, **kwargs):
+                ctx: Context
+                
+                if "ctx" in kwargs.keys():
+                    ctx = kwargs.get("ctx")
+                else:
+                    ctx = args.__getitem__(1)
+                    
+                if ContextExtractor.is_author_joined_voice_channel(ctx):
+                    if ContextExtractor.is_beak_joined_voice_channel(ctx):
+                        if ContextExtractor.is_beak_and_author_same_voice_channel(ctx):
+                            await func(*args, **kwargs)
+                            
+                        else:
+                            await BeakNotification.Error.notice_not_same_channel(ctx)
+                        
+                    else:
+                        await BeakNotification.Error.notice_beak_not_entered_channel(ctx)
+
+                else:
+                    await BeakNotification.Error.notice_author_not_entered_channel(ctx)
+            
+            return wrapper
+        return _decof
+    
 
 
 class Beak(metaclass=Singleton):
@@ -259,6 +290,7 @@ class Beak(metaclass=Singleton):
             await self.beak_exit(ctx=ctx)    
 
 
+    @BeakInspector.coro_commander_inspection()
     async def beak_player_reset(self, ctx: Context) -> None:
         guild_id: int = ContextExtractor.get_guild_id(ctx=ctx)
         guild_player: Player = self.player_pool.get(guild_id=guild_id)
