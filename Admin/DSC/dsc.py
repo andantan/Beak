@@ -133,9 +133,9 @@ class Logger(Block.Instanctiating):
                             break
 
                     _embed.add_field(
-                        name=field.get("name"),
-                        value=field.get("value"),
-                        inline=field.get("inline")
+                        name=field.get(_k.__getitem__(0)),
+                        value=field.get(_k.__getitem__(1)),
+                        inline=field.get(_k.__getitem__(2))
                     )
 
             _embed.set_footer(text="Beak-DSC by Qbean")

@@ -271,7 +271,7 @@ async def execute_DSC(ctx: Context, *args):
             try:
                 channel = bot.get_channel(int(args.__getitem__(1)))
 
-                await channel.send(f"{args.__getitem__(2)}")
+                await channel.send(f"{' '.join(args[2:])}")
 
             except Exception as e:
                 print(e)

@@ -9,7 +9,7 @@ from discord.ext.commands.context import Context, Interaction
 Version = str
 
 Metadata = Union[Context, Interaction]
-EmbedField = Dict[str, Union[str, Any]]
-EmbedFields = List[Dict[str, Union[str, Any]]]
+EmbedField = Dict[str, Union[str, bool]]
+EmbedFields = List[EmbedField]
 EmbedValues = Dict[str, str]
 VoiceStreamChannel = Union[VoiceChannel, StageChannel, None]
