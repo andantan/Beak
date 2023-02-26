@@ -184,84 +184,6 @@ class Callback(Block.Instanctiating):
                 await BeakNotification.Error.notice_already_paused(metadata=interaction)
 
 
-        # deprecated 2023-02-24
-        # 
-        # @staticmethod
-        # @CallbackInspector.coro_interaction_inspection()
-        # async def callback_exit(interaction: Interaction) -> None:
-        #     guild_id = InteractionExtractor.get_guild_id(interaction)
-        #     guild_player: Player = PlayerPool().get(guild_id)
-
-        #     if guild_player.is_connected:
-        #         await guild_player.voice_client.disconnect()
-
-        #         PlayerPool().__delitem__(guild_id)
-                
-        #         await BeakNotification.Playlist.discard(metadata=interaction, player=guild_player)
-
-        # deprecated 2023-02-24
-        #
-        # @staticmethod
-        # @CallbackInspector.coro_interaction_inspection()
-        # async def callback_haevy_playlist(interaction: Interaction) -> None:
-        #     guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-        #     if guild_player.is_connected:
-        #         await BeakNotification.Playlist.notice_playlist(metadata=interaction, player=guild_player)
-
-
-        # deprecated 2023-02-24
-        #        
-        # @staticmethod
-        # @CallbackInspector.coro_interaction_inspection()
-        # async def callback_remove(interaction: Interaction) -> None:
-        #     guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-        #     if guild_player.is_queue_two_or_more:
-        #         if guild_player.is_connected:
-        #             try:
-        #                 removed_audio_title = guild_player.seek_next_queue.get("title")
-
-        #                 guild_player.remove()
-
-        #                 await BeakNotification.Playlist.notice_removed(metadata=interaction, title=removed_audio_title)
-        #                 await BeakNotification.Playlist.deploy(player=guild_player)
-                    
-        #             except IndexError:
-        #                 #TODO: Handling this section
-        #                 pass
-
-        #     else:
-        #         await BeakNotification.Error.notice_last_audio(metadata=interaction)     
-
-
-        # deprecated 2023-02-24
-        #        
-        # @staticmethod
-        # @CallbackInspector.coro_interaction_inspection()
-        # async def callback_refresh(interaction: Interaction) -> None:
-        #     guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-        #     if guild_player.is_connected:
-        #         await BeakNotification.Playlist.deploy(player=guild_player)
-
-        #         await interaction.response.defer()
-
-
-        # deprecated 2023-02-24
-        #
-        # @staticmethod
-        # @CallbackInspector.coro_interaction_inspection()
-        # async def callback_reset(interaction: Interaction) -> None:
-        #     guild_player: Player = PlayerPool().get(InteractionExtractor.get_guild_id(interaction))
-
-        #     if guild_player.is_connected:
-        #         guild_player.reset()
-
-        #         await BeakNotification.Playlist.deploy(player=guild_player)
-        #         await BeakNotification.Playlist.notice_reset_playlist(metadata=interaction, player=guild_player)
-
-
 
     class SelectMenu(Block.Instanctiating):
         @staticmethod
@@ -303,12 +225,19 @@ class Callback(Block.Instanctiating):
 class CommandNotification(Block.Instanctiating):
     class Default(Block.Instanctiating):
         @staticmethod
-        async def notice_default_embed(ctx: Context, **kwargs) -> None:
-            _embed = Embed(**kwargs)
+        async def notice_default_embed(metadata: Metadata, delay: int=DEFAULT_DELAY,**kwargs) -> None:
+            try:
+                _embed = Embed(**kwargs)
 
-            _embed.set_footer(text="Beak by Qbean")
+                _embed.set_footer(text="Beak by Qbean")
 
-            await ctx.send(embed=_embed, delete_after=DEFAULT_DELAY)
+                if isinstance(metadata, Context):
+                    await metadata.send(embed=_embed, delete_after=delay)
+                
+                elif isinstance(metadata, Interaction):
+                    await metadata.response.send_message(embed=_embed, delete_after=delay)
+            except Exception as e:
+                print(e)
 
 
 
@@ -322,7 +251,7 @@ class CommandNotification(Block.Instanctiating):
                 "color" : COMMANDER_NOTICE_EMBED_COLOR
             }
 
-            await CommandNotification.Default.notice_default_embed(ctx=ctx, **values)
+            await CommandNotification.Default.notice_default_embed(metadata=ctx, **values)
 
 
         @staticmethod
@@ -334,7 +263,7 @@ class CommandNotification(Block.Instanctiating):
                 "color" : COMMANDER_NOTICE_EMBED_COLOR
             }
 
-            await CommandNotification.Default.notice_default_embed(ctx=ctx, **values)
+            await CommandNotification.Default.notice_default_embed(metadata=ctx, **values)
 
         
         @staticmethod
@@ -345,34 +274,34 @@ class CommandNotification(Block.Instanctiating):
                 "color" : COMMANDER_NOTICE_EMBED_COLOR
             }
 
-            await CommandNotification.Default.notice_default_embed(ctx=ctx, **values)
+            await CommandNotification.Default.notice_default_embed(metadata=ctx, **values)
 
 
 
+# deprecated 2023-02-26
+#
+# class AdminNotification(Block.Instanctiating):
+#     class Default(Block.Instanctiating):
+#         @staticmethod
+#         async def notice_default_embed(ctx: Context, **kwargs) -> None:
+#             _embed = Embed(**kwargs)
+
+#             _embed.set_footer(text="Beak-DSC by Qbean")
+
+#             await ctx.send(embed=_embed, delete_after=DEFAULT_DELAY)
 
 
-class AdminNotification(Block.Instanctiating):
-    class Default(Block.Instanctiating):
-        @staticmethod
-        async def notice_default_embed(ctx: Context, **kwargs) -> None:
-            _embed = Embed(**kwargs)
 
-            _embed.set_footer(text="Beak-DSC by Qbean")
+#     class Admin(Block.Instanctiating):
+#         @staticmethod
+#         async def notice_not_authorized_user(ctx: Context) -> None:
+#             values = {
+#                 "title": "Beak Debugger, Supervisor & Controller",
+#                 "description": "어드민 권한이 없습니다.",
+#                 "color": COMMANDER_NOTICE_EMBED_COLOR
+#             }
 
-            await ctx.send(embed=_embed, delete_after=DEFAULT_DELAY)
-
-
-
-    class Admin(Block.Instanctiating):
-        @staticmethod
-        async def notice_not_authorized_user(ctx: Context) -> None:
-            values = {
-                "title": "Beak Debugger, Supervisor & Controller",
-                "description": "어드민 권한이 없습니다.",
-                "color": COMMANDER_NOTICE_EMBED_COLOR
-            }
-
-            await AdminNotification.Default.notice_default_embed(ctx=ctx, **values)
+#             await AdminNotification.Default.notice_default_embed(ctx=ctx, **values)
 
 
 

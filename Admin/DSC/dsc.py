@@ -12,18 +12,22 @@ from Core.Cache.Queue.queue import AsyncQueue
 
 from Class.superclass import Block
 
+from Types.Generic.vars import (
+    Version,
+    Metadata,
+    EmbedField,
+    EmbedFields,
+    EmbedValues,
+    VoiceStreamChannel
+)
+
 from Data.Paraments.settings import (
     DSC_NOTICE_EMBED_COLOR,
     DSC_DEFAULT_DELAY,
     QUEUE_THRESHOLD,
-    OVER_QUEUE_THRESHOLD
 )
 
 
-Metadata = Union[Context, Interaction]
-EmbedFields = List[Dict[str, Union[str, Any]]]
-EmbedValues = Dict[str, str]
-VoiceStreamChannel = Union[VoiceChannel, StageChannel, None]
  
 class DSC(Block.Instanctiating):
     class Debugger(Block.Instanctiating):
@@ -33,15 +37,20 @@ class DSC(Block.Instanctiating):
     
     class Supervisor(Block.Instanctiating):
         @staticmethod
-        async def executed_commands_on_patching(metadata: Metadata, **kwargs):
-            __version__ = kwargs.__getitem__("prev_version")
-            __patch_version__ = kwargs.__getitem__("updated_version")
+        async def notice_patching(metadata: Metadata, **kwargs) -> None:
+            __version__: Version = kwargs.__getitem__("prev_version")
+            __patch_version__: Version = kwargs.__getitem__("updated_version")
 
             await Logger.EmbedNotification.notice_patching(
                 metadata=metadata, 
                 now_version=__version__, 
                 update_version=__patch_version__
             )
+
+
+        @staticmethod
+        async def notice_not_authorized_user(metadata: Metadata) -> None:
+            await Logger.EmbedNotification.notice_not_authorized_user(metadata=metadata)
 
     
     class Controller(Block.Instanctiating):
@@ -83,7 +92,8 @@ class DSC(Block.Instanctiating):
 
         @staticmethod
         async def connect_client(channel: VoiceStreamChannel) -> VoiceClient:
-            _vc = await channel.connect()
+            raise NotImplementedError
+            # _vc = await channel.connect()
 
 
         @staticmethod
@@ -139,19 +149,19 @@ class Logger(Block.Instanctiating):
 
         @staticmethod
         async def notice_unallocated_guild_id(metadata: Metadata, ero: Exception) -> None:
-            values = {
+            values: EmbedValues = {
                 "title" : f"DSC activated", 
                 "description" : f"Detected {ero.__class__.__name__} - Unallocated guild id({metadata.guild.id})",
                 "color" : DSC_NOTICE_EMBED_COLOR
             }
 
-            field = {
+            field: EmbedField = {
                 "name": "Controller executed",
                 "value": f"Fetching Controller.allocate_player",
                 "inline": False
             }
 
-            fields = [
+            fields: EmbedFields = [
                 field
             ]
 
@@ -160,7 +170,7 @@ class Logger(Block.Instanctiating):
 
         @staticmethod
         async def notice_saturated_queue(metadata: Metadata, ero: Exception) -> None:
-            values = {
+            values: EmbedValues = {
                 "title" : f"DSC executed: {ero.__class__.__name__}", 
                 "description" : f"The queue has been saturated(THRESHOLD: {QUEUE_THRESHOLD})",
                 "color" : DSC_NOTICE_EMBED_COLOR
@@ -170,21 +180,42 @@ class Logger(Block.Instanctiating):
 
 
         @staticmethod
-        async def notice_patching(metadata: Metadata, now_version: str, update_version: str) -> None:
-            values = {
-                "title" : f"Beak-DSC beta", 
+        async def notice_patching(metadata: Metadata, now_version: Version, update_version: Version) -> None:
+            values: EmbedValues = {
+                "title" : f"Beak-DSC", 
                 "description" : f"현재 Beak 패치 및 업데이트 중입니다.",
                 "color" : DSC_NOTICE_EMBED_COLOR
             }
 
-            field = {
+            field: EmbedField = {
                 "name": "Supervisor executed",
                 "value": f"현 버전: {now_version}, 패치 버전: {update_version}",
                 "inline": False
             }
 
-            fields = [
+            fields: EmbedFields = [
                 field
             ]
 
             await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values, fields=fields)
+
+
+        @staticmethod
+        async def notice_not_authorized_user(ctx: Context) -> None:
+            values: EmbedValues = {
+                "title": "Beak-DSC",
+                "description": "어드민 권한이 없습니다.",
+                "color": DSC_NOTICE_EMBED_COLOR
+            }
+
+            field: EmbedField = {
+                "name": "❌  Access denied  ❌",
+                "value": f"basis: {ctx.author.name} - {ctx.author.id}",
+                "inline": False
+            }
+
+            fields: EmbedFields = [
+                field
+            ]
+
+            await Logger.EmbedNotification.embed_wrapper(metadata=ctx, values=values, fields=fields)

@@ -11,22 +11,26 @@ from discord.ext import commands
 from discord.ext.commands.context import Context
 
 from Admin.Private.manager import Manager
+from Admin.DSC.dsc import DSC
 from Admin.DSC.debugger import Debugger
 
 from Tools.Functions.function import (
-    CommandNotification, 
-    AdminNotification, 
+    CommandNotification,
     BeakNotification
 )
 
 from Core.Cache.storage import Storage
 from Core.beak import Beak
 
+
+
+
+
 LOGGING = True
 PATCHING = False
 
-__version__ = "v3.2.1.06"
-__patch_version__ = "v3.2.1.07"
+__version__ = "v3.2.2"
+__patch_version__ = "v3.2.3"
 
 intents = Intents.default()
 intents.members = True
@@ -253,7 +257,7 @@ async def execute_DSC(ctx: Context, *args):
 
         
     else:
-        await AdminNotification.Admin.notice_not_authorized_user(ctx=ctx)
+        await DSC.Supervisor.notice_not_authorized_user(metadata=ctx)
 
 
 def main():

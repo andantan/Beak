@@ -77,7 +77,7 @@ class Beak(metaclass=Singleton):
 
     
     async def beak_patching(self, ctx: Context, **kwargs) -> None:
-        await DSC.Supervisor.executed_commands_on_patching(metadata=ctx, **kwargs)
+        await DSC.Supervisor.notice_patching(metadata=ctx, **kwargs)
 
 
     def __alloc_pool__(self, guild_id: int, voice_client: VoiceClient) -> None:
