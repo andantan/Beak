@@ -300,3 +300,8 @@ class Beak(metaclass=Singleton):
 
             await BeakNotification.Playlist.deploy(player=guild_player)
             await BeakNotification.Playlist.notice_reset_playlist(metadata=ctx)
+
+
+    @BeakInspector.coro_commander_inspection()
+    async def beak_player_exit(self, ctx: Context) -> None:
+        await self.beak_exit(ctx=ctx)

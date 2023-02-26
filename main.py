@@ -102,6 +102,13 @@ async def breset(ctx: Context) -> None:
     await beak.beak_player_reset(ctx=ctx)
 
 
+@bot.command(aliases=["exit", "퇴장"])
+async def bexit(ctx: Context) -> None:
+    await ctx.message.delete()
+
+    await beak.beak_player_exit(ctx=ctx)
+
+
 
 @bot.command(aliases=["명령어", "도움말"])
 async def bhelp(ctx: Context) -> None:
