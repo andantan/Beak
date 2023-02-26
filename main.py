@@ -149,7 +149,7 @@ async def bexit(ctx: Context) -> None:
 
 
 
-@bot.command(aliases=["명령어", "도움말"])
+@bot.command(aliases=["명령어", "도움"])
 async def bhelp(ctx: Context) -> None:
     await ctx.message.delete()
 
@@ -195,6 +195,18 @@ async def bhelp(ctx: Context) -> None:
     embed.add_field(
         name = "퇴장",
         value = "해당 음성 채널에 아무도 없을 시에 음원이 끝나면 자동으로 퇴장합니다.",
+        inline = False
+    )
+
+    embed.add_field(
+        name = "퇴장 명령어: ~exit 또는 ~퇴장",
+        value = "Beak를 강제로 퇴장시킵니다.",
+        inline = False
+    )
+
+    embed.add_field(
+        name = "리셋 명령어: ~reset 또는 ~리셋",
+        value = "현재 재생 중인 음원을 제외한 모든 대기열을 초기화합니다.",
         inline = False
     )
 
@@ -255,7 +267,6 @@ async def execute_DSC(ctx: Context, *args):
         if args.__getitem__(0) == "-c" or args.__getitem__(0) == "--context-extractor":
             Debugger.debug_context_extractor(ctx=ctx)
 
-        
     else:
         await DSC.Supervisor.notice_not_authorized_user(metadata=ctx)
 
