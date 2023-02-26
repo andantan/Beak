@@ -53,18 +53,6 @@ async def on_ready():
     Storage.Identification().set_admin_ids(administrator_identifications)
 
 
-@bot.command(aliases=["members"])
-async def bmembers(ctx: Context) -> None:
-    voice_channel_members = ctx.author.voice.channel.members
-
-    for member in voice_channel_members:
-        print(f"{member.name}: {member.id}")
-
-        if int(member.id) == 1052869478255435787:
-            await member.kick()
-
-        
-
 
 # deprecated 2023-02-24
 #
@@ -105,6 +93,13 @@ async def bplay(ctx: Context, *args) -> None:
         await BeakNotification.Playlist.notice_video_founded(metadata=ctx, title=title)
 
     await beak.beak_play(ctx=ctx, URL=URL)
+
+
+@bot.command(aliases=["reset", "리셋", "초기화"])
+async def breset(ctx: Context) -> None:
+    await ctx.message.delete()
+
+    await beak.beak_player_reset(ctx=ctx)
 
 
 

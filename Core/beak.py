@@ -257,3 +257,14 @@ class Beak(metaclass=Singleton):
         else:
             await BeakNotification.Playlist.notice_playlist_is_ended(metadata=ctx) 
             await self.beak_exit(ctx=ctx)    
+
+
+    async def beak_player_reset(self, ctx: Context) -> None:
+        guild_id: int = ContextExtractor.get_guild_id(ctx=ctx)
+        guild_player: Player = self.player_pool.get(guild_id=guild_id)
+
+        if guild_player.is_connected:
+            guild_player.reset()
+
+            await BeakNotification.Playlist.deploy(player=guild_player)
+            await BeakNotification.Playlist.notice_reset_playlist(metadata=ctx)
