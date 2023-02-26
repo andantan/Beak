@@ -75,20 +75,13 @@ class Beak(metaclass=Singleton):
     def __init__(self) -> None:
         self.player_pool: PlayerPool = PlayerPool()
 
+    
+    async def beak_patching(self, ctx: Context, **kwargs) -> None:
+        await DSC.Supervisor.executed_commands_on_patching(metadata=ctx, **kwargs)
+
 
     def __alloc_pool__(self, guild_id: int, voice_client: VoiceClient) -> None:
         if guild_id in self.player_pool:
-            # deprcated 2023-02-23 
-            #
-            # player: Player = self.player_pool.__getitem__(guild_id)
-            #
-            # raise BeakErrors.AlreadyAllocatedGuildId(
-            #     guild_id = guild_id,
-            #     is_connected = player.is_connected,
-            #     is_activated = player.is_activated,
-            #     is_msg_saved = player.is_message_saved
-            # )
-
             raise BeakError.AllocatedIdentificationError
 
         
@@ -118,16 +111,6 @@ class Beak(metaclass=Singleton):
         await BeakNotification.Playlist.discard(metadata=ctx, player=guild_player)
 
         self.__discard_pool__(guild_id=guild_id)
-
-    
-    def DSC_get_guild_player(self, guild_id) ->Optional[Player]:
-        raise NotImplementedError
-
-
-    # deprecated 2023-02-24
-    #
-    # def is_beak_already_entered_channel(self, guild_id: int) -> bool:
-    #     return guild_id in self.player_pool
 
 
     async def __ytdl_executor(self, URL: str, Debug=False) -> List[Dict[str, str]]:

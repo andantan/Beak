@@ -23,6 +23,10 @@ from Core.Cache.storage import Storage
 from Core.beak import Beak
 
 LOGGING = True
+PATCHING = False
+
+__version__ = "v3.2.1.06"
+__patch_version__ = "v3.2.1.07"
 
 intents = Intents.default()
 intents.members = True
@@ -47,7 +51,11 @@ async def on_ready():
     beak = Beak()
 
     await bot.change_presence(status=discord.Status.online)
-    await bot.change_presence(activity=discord.Game(name=f"{DEFAULT_COMMAND_PREFIX}도움말"))
+
+    if PATCHING:
+        await bot.change_presence(activity=discord.Game(name=f"패치 중"))
+    else:
+        await bot.change_presence(activity=discord.Game(name=f"{DEFAULT_COMMAND_PREFIX}도움말"))
 
     Storage.Identification().set_beak_id(bot.user.id)
     Storage.Identification().set_admin_ids(administrator_identifications)
@@ -69,6 +77,15 @@ async def on_ready():
 @bot.command(aliases=["play", "p", "P", "재생", "제로"])
 async def bplay(ctx: Context, *args) -> None:
     await ctx.message.delete()
+
+    if PATCHING:
+        await beak.beak_patching(
+            ctx=ctx, 
+            prev_version=__version__, 
+            updated_version=__patch_version__
+        )
+
+        return
 
     if len(args) == 0:
         await CommandNotification.Error.notice_missing_required_arguments(ctx=ctx)
@@ -99,12 +116,30 @@ async def bplay(ctx: Context, *args) -> None:
 async def breset(ctx: Context) -> None:
     await ctx.message.delete()
 
+    if PATCHING:
+        await beak.beak_patching(
+            ctx=ctx, 
+            prev_version=__version__, 
+            updated_version=__patch_version__
+        )
+
+        return
+
     await beak.beak_player_reset(ctx=ctx)
 
 
 @bot.command(aliases=["exit", "퇴장"])
 async def bexit(ctx: Context) -> None:
     await ctx.message.delete()
+
+    if PATCHING:
+        await beak.beak_patching(
+            ctx=ctx, 
+            prev_version=__version__, 
+            updated_version=__patch_version__
+        )
+
+        return
 
     await beak.beak_player_exit(ctx=ctx)
 
@@ -113,6 +148,15 @@ async def bexit(ctx: Context) -> None:
 @bot.command(aliases=["명령어", "도움말"])
 async def bhelp(ctx: Context) -> None:
     await ctx.message.delete()
+
+    if PATCHING:
+        await beak.beak_patching(
+            ctx=ctx, 
+            prev_version=__version__, 
+            updated_version=__patch_version__
+        )
+
+        return
 
     embed = discord.Embed(
         title="🐼 재생 명령어 🐼", 
@@ -218,13 +262,21 @@ def main():
 
     else:
         sys.stderr.write("Missing value in config\n")
-        sys.stderr.write("Configuration must have values 'TOKEN', 'DEFAULT_COMMAND_PREFIX' and 'ADMINISTTRATOR_COMMAND_PREFIX'")
+        sys.stderr.write("Configuration must have values 'TOKEN', \
+                         'DEFAULT_COMMAND_PREFIX' and 'ADMINISTTRATOR_COMMAND_PREFIX'")
 
         sys.exit(1)
 
 
 
 if __name__ == "__main__":
-    # PPRM
-    main()
-    
+    try:
+        patch_argv: str = sys.argv[1]
+
+        if patch_argv.__eq__("patch"):
+            PATCHING = True
+    except IndexError:
+        ...
+    finally:
+        # PPRM
+        main()

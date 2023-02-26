@@ -32,8 +32,16 @@ class DSC(Block.Instanctiating):
 
     
     class Supervisor(Block.Instanctiating):
-        ...
+        @staticmethod
+        async def executed_commands_on_patching(metadata: Metadata, **kwargs):
+            __version__ = kwargs.__getitem__("prev_version")
+            __patch_version__ = kwargs.__getitem__("updated_version")
 
+            await Logger.EmbedNotification.notice_patching(
+                metadata=metadata, 
+                now_version=__version__, 
+                update_version=__patch_version__
+            )
 
     
     class Controller(Block.Instanctiating):
@@ -159,3 +167,24 @@ class Logger(Block.Instanctiating):
             }
 
             await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values)
+
+
+        @staticmethod
+        async def notice_patching(metadata: Metadata, now_version: str, update_version: str) -> None:
+            values = {
+                "title" : f"Beak-DSC beta", 
+                "description" : f"현재 Beak 패치 및 업데이트 중입니다.",
+                "color" : DSC_NOTICE_EMBED_COLOR
+            }
+
+            field = {
+                "name": "Supervisor executed",
+                "value": f"현 버전: {now_version}, 패치 버전: {update_version}",
+                "inline": False
+            }
+
+            fields = [
+                field
+            ]
+
+            await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values, fields=fields)
