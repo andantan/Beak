@@ -50,7 +50,7 @@ class DSC(Block.Instanctiating):
 
         @staticmethod
         async def notice_not_authorized_user(metadata: Metadata) -> None:
-            await Logger.EmbedNotification.notice_not_authorized_user(metadata=metadata)
+            await Logger.EmbedNotification.notice_not_authorized_user(ctx=metadata)
 
     
     class Controller(Block.Instanctiating):

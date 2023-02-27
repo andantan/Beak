@@ -30,7 +30,7 @@ from Core.beak import Beak
 LOGGING = True
 PATCHING = False
 
-__version__ = "v3.2.4.02"
+__version__ = "v3.2.4.04"
 __patch_version__ = "v3.2.5"
 
 intents = Intents.default()
@@ -166,11 +166,31 @@ async def bexit(ctx: Context) -> None:
 # Utility Section
 @bot.command(aliases=["팀짜기"])
 async def bteaming(ctx: Context) -> None:
+    if PATCHING:
+        if not Storage.Identification().is_admin(ctx.author.id):
+            await beak.beak_patching(
+                ctx=ctx, 
+                prev_version=__version__, 
+                updated_version=__patch_version__
+            )
+
+            return
+        
     await Selection.random_teaming(ctx=ctx)
 
 
 @bot.command(aliases=["사다리", "몰가"])
 async def bladder(ctx: Context, *args) -> None:
+    if PATCHING:
+        if not Storage.Identification().is_admin(ctx.author.id):
+            await beak.beak_patching(
+                ctx=ctx, 
+                prev_version=__version__, 
+                updated_version=__patch_version__
+            )
+
+            return
+        
     await Selection.random_ladder(ctx=ctx, options=args)
 
 
