@@ -80,7 +80,7 @@ class Messenger(Block.Instanctiating):
                                         ) -> None:
             values: EmbedValues = {
                 "title": "팀 짜기 결과",
-                "description": f"총 인원: {len(team_one) + len(team_two)}",
+                "description": f"총 인원: {len(team_one) + len(team_two)}명",
                 "color": NOTICE_EMBED_COLOR
             }
 
@@ -91,13 +91,13 @@ class Messenger(Block.Instanctiating):
             for member in team_two: team_two_str += f"{member.mention} "
 
             field1: EmbedField = {
-                "name": f"1팀({len(team_one)}명)",
+                "name": f"1팀 ({len(team_one)}명)",
                 "value": team_one_str,
                 "inline": False
             }
 
             field2: EmbedField = {
-                "name": f"2팀({len(team_one)}명)",
+                "name": f"2팀 ({len(team_one)}명)",
                 "value": team_two_str,
                 "inline": False
             }

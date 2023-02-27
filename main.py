@@ -30,8 +30,8 @@ from Core.beak import Beak
 LOGGING = True
 PATCHING = False
 
-__version__ = "v3.2.4"
-__patch_version__ = "v3.2.4.02"
+__version__ = "v3.2.4.02"
+__patch_version__ = "v3.2.5"
 
 intents = Intents.default()
 intents.members = True
