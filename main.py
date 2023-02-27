@@ -187,36 +187,6 @@ async def bhelp(ctx: Context) -> None:
     )
 
     embed.add_field(
-        name = "버튼:  ⏮,  ⏭️",
-        value = "이전 음원을 다시 재생하거나 다음 음원을 재생합니다.",
-        inline = False
-    )
-
-    embed.add_field(
-        name = "버튼:  ▶️,  ⏸️",
-        value = "재생 중이면 일시정지, 일시정지 중이면 다시 재생합니다.",
-        inline = False
-    )
-
-    embed.add_field(
-        name = "버튼:  🔀",
-        value = "재생 완료된 음원과 재생 대기 중인 음원 모두 셔플합니다.",
-        inline = False
-    )
-
-    embed.add_field(
-        name = "버튼:  ➡️,  🔁,  🔂",
-        value = "재생 모드를 번갈아가며 변경합니다. \n변경된 재생 모드는 플레이어의 \"재생 모드\"를 확인해주세요.",
-        inline = False
-    )
-
-    embed.add_field(
-        name = "퇴장",
-        value = "해당 음성 채널에 아무도 없을 시에 음원이 끝나면 자동으로 퇴장합니다.",
-        inline = False
-    )
-
-    embed.add_field(
         name = "퇴장 명령어: ~exit 또는 ~퇴장",
         value = "Beak를 강제로 퇴장시킵니다.",
         inline = False
@@ -225,6 +195,12 @@ async def bhelp(ctx: Context) -> None:
     embed.add_field(
         name = "리셋 명령어: ~reset 또는 ~리셋",
         value = "현재 재생 중인 음원을 제외한 모든 대기열을 초기화합니다.",
+        inline = False
+    )
+
+    embed.add_field(
+        name = "팀짜기 명령여: ~teaming 또는 ~팀짜기",
+        value = "현재 유저가 입장한 음성 채널을 기준으로 두 팀으로 랜덤하게 나눕니다.",
         inline = False
     )
 
