@@ -82,6 +82,15 @@ class Messenger(Block.Instanctiating):
             await Messenger.Default.embed_wrapper(metadata=metadata, values=values)
 
 
+        @staticmethod
+        async def notice_too_many_options(metadata: Metadata) -> None:
+            values: EmbedValues = {
+                "title" : "서버의 안정을 위하여 10개 이하로 옵션을 제한해주세요.",
+                "color" : NOTICE_EMBED_COLOR
+            }
+
+            await Messenger.Default.embed_wrapper(metadata=metadata, values=values)
+
 
     class _Selection(Block.Instanctiating):
         @staticmethod
@@ -185,7 +194,9 @@ class Selection(Block.Instanctiating):
             return
         
         if len(options) > 10:
-            pass
+            await Messenger.Error.notice_too_many_options(metadata=ctx)
+
+            return
             
         _bi: MemberId = Storage.Identification().get_beak_id()
 
