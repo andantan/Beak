@@ -7,6 +7,7 @@ from discord.ext.commands.context import Context, Interaction
 
 
 Version = str
+MemberId = int
 
 Metadata = Union[Context, Interaction]
 EmbedField = Dict[str, Union[str, bool]]

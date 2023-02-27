@@ -11,6 +11,7 @@ from Tools.Functions.function import BeakNotification
 from Utils.extractor import InteractionExtractor
 
 
+# deprecated 2023-02-27
 class CallbackInspector(Block.Instanctiating):
     @staticmethod
     def coro_interaction_inspection():
@@ -43,6 +44,7 @@ class CallbackInspector(Block.Instanctiating):
 
 
 
+# deprecated 2023-02-27
 class Callback(Block.Instanctiating):
     __slots__ = ()
 

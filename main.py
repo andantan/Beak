@@ -20,6 +20,7 @@ from Tools.Functions.function import (
 )
 
 from Core.Cache.storage import Storage
+from Core.Utils.utils import Selection
 from Core.beak import Beak
 
 
@@ -29,8 +30,8 @@ from Core.beak import Beak
 LOGGING = True
 PATCHING = False
 
-__version__ = "v3.2.3"
-__patch_version__ = "v3.2.3.02"
+__version__ = "v3.2.4"
+__patch_version__ = "v3.2.4.02"
 
 intents = Intents.default()
 intents.members = True
@@ -59,7 +60,7 @@ async def on_ready():
     if PATCHING:
         await bot.change_presence(
             activity = discord.Game(
-            name = f"업데이트(버전: {__version__})"
+            name = f"업데이트(버전: {__patch_version__})"
             )
         )
     else:
@@ -85,6 +86,10 @@ async def on_ready():
 #         if command_name.__eq__("bplay"):
 #             await CommandNotification.Error.notice_missing_required_arguments(ctx=ctx)
 
+
+@bot.command(aliases=["팀짜기"])
+async def bteaming(ctx: Context) -> None:
+    await Selection.random_teaming(ctx=ctx)
 
 
 @bot.command(aliases=["play", "p", "P", "재생", "제로"])
@@ -267,7 +272,9 @@ async def bextract(ctx: Context, url: str) -> None:
 @bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
 async def execute_DSC(ctx: Context, *args):
     if Storage.Identification().is_admin(ctx.author.id):
-        if args.__getitem__(0) == "-n" or args.__getitem__(0) == "--notice":
+        commands: str = args.__getitem__(0)
+
+        if commands == "-n" or commands == "--notice":
             try:
                 channel = bot.get_channel(int(args.__getitem__(1)))
 
@@ -277,8 +284,18 @@ async def execute_DSC(ctx: Context, *args):
                 print(e)
                 print(e.__doc__)
         
-        if args.__getitem__(0) == "-c" or args.__getitem__(0) == "--context-extractor":
+        elif commands == "-c" or commands == "--context-extractor":
             Debugger.debug_context_extractor(ctx=ctx)
+
+        elif commands == "diagnose" or commands == "--diagnose-self":
+            # print(ctx.)
+            ...
+
+        elif commands == "-m" or commands == "--get-members":
+            members = ctx.author.voice.channel.members
+
+            for member in members:
+                print(f"{member.name}: {member.id}")
 
     else:
         await DSC.Supervisor.notice_not_authorized_user(metadata=ctx)

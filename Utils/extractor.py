@@ -136,7 +136,15 @@ class ContextExtractor(Block.Instanctiating):
     @staticmethod
     def get_beak_member(ctx: Context) -> discord.Member:
         return ctx.guild.get_member(Storage.Identification().get_beak_id())
+    
 
+    @staticmethod
+    def get_voice_channel_member(ctx: Context) -> Optional[List[discord.Member]]:
+        if not ContextExtractor.is_author_joined_voice_channel(ctx=ctx):
+            return None
+
+        return ctx.author.voice.channel.members
+    
 
     @staticmethod
     def get_author_entered_voice_channel(ctx: Context) -> Union[VoiceChannel, StageChannel, None]:

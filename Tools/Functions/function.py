@@ -1,5 +1,4 @@
 import datetime
-import asyncio
 from typing import Dict, List, Tuple, Union, Optional, NewType, Callable, Coroutine, TypeVar
 
 import discord
