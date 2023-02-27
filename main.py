@@ -87,10 +87,6 @@ async def on_ready():
 #             await CommandNotification.Error.notice_missing_required_arguments(ctx=ctx)
 
 
-@bot.command(aliases=["팀짜기"])
-async def bteaming(ctx: Context) -> None:
-    await Selection.random_teaming(ctx=ctx)
-
 
 @bot.command(aliases=["play", "p", "P", "재생", "제로"])
 async def bplay(ctx: Context, *args) -> None:
@@ -163,6 +159,20 @@ async def bexit(ctx: Context) -> None:
             return
 
     await beak.beak_player_exit(ctx=ctx)
+
+
+
+
+# Utility Section
+@bot.command(aliases=["팀짜기"])
+async def bteaming(ctx: Context) -> None:
+    await Selection.random_teaming(ctx=ctx)
+
+
+@bot.command(aliases=["사다리", "몰가"])
+async def bladder(ctx: Context, *args) -> None:
+    await Selection.random_ladder(ctx=ctx, options=args)
+
 
 
 

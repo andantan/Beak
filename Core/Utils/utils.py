@@ -60,11 +60,22 @@ class Messenger(Block.Instanctiating):
             if isinstance(metadata, Interaction):
                 await metadata.response.send_message(embed=_embed)
 
-            
+
+    class Error(Block.Instanctiating):
         @staticmethod
         async def notice_author_not_entered_channel(metadata: Metadata) -> None:
             values: EmbedValues = {
                 "title" : "음성 채널에 입장 후 명령어를 입력해주세요.",
+                "color" : NOTICE_EMBED_COLOR
+            }
+
+            await Messenger.Default.embed_wrapper(metadata=metadata, values=values)
+
+
+        @staticmethod
+        async def notice_not_equal_numbers(metadata: Metadata) -> None:
+            values: EmbedValues = {
+                "title" : "옵션의 개수와 음성 채널의 인원 수가 맞지 않습니다.",
                 "color" : NOTICE_EMBED_COLOR
             }
 
@@ -109,12 +120,39 @@ class Messenger(Block.Instanctiating):
             await Messenger.Default.embed_wrapper(metadata=metadata, values=values, fields=fields)
 
 
+        @staticmethod
+        async def notice_ladder_result(metadata: Metadata,
+                                       members: List[Member],
+                                       options: Tuple[str]
+                                    ) -> None:
+            values: EmbedValues = {
+                "title": "사다리 결과",
+                "description": f"총 {len(members)}명, 옵션 {len(options)}개 매칭 완료.",
+                "color": NOTICE_EMBED_COLOR
+            }
+
+            fields: List[EmbedField] = list()
+
+            for index, member in enumerate(members):
+                field: EmbedField = {
+                    "name": member.name,
+                    "value": options.__getitem__(index),
+                    "inline": False
+                }
+
+                fields.append(field)
+
+            else:
+                await Messenger.Default.embed_wrapper(metadata=metadata, values=values, fields=fields)
+
+
+
 
 class Selection(Block.Instanctiating):
     @staticmethod
     async def random_teaming(ctx: Context) -> None:
         if not ContextExtractor.is_author_joined_voice_channel(ctx=ctx):
-            await Messenger.Default.notice_author_not_entered_channel(metadata=ctx)
+            await Messenger.Error.notice_author_not_entered_channel(metadata=ctx)
 
             return
             
@@ -128,7 +166,6 @@ class Selection(Block.Instanctiating):
         member_number = len(filtered_members)
 
         pivot = int(member_number / 2) if member_number % 2 == 0 else math.floor(member_number / 2)
-        print(pivot)
 
         team_one: List[Member] = filtered_members[:pivot]
         team_two: List[Member] = filtered_members[pivot:]
@@ -138,3 +175,35 @@ class Selection(Block.Instanctiating):
             team_one = team_one,
             team_two = team_two
         )
+
+
+    @staticmethod
+    async def random_ladder(ctx: Context, options: Tuple[str]) -> None:
+        if not ContextExtractor.is_author_joined_voice_channel(ctx=ctx):
+            await Messenger.Error.notice_author_not_entered_channel(metadata=ctx)
+
+            return
+        
+        if len(options) > 10:
+            pass
+            
+        _bi: MemberId = Storage.Identification().get_beak_id()
+
+        members: List[Member] = ContextExtractor.get_voice_channel_member(ctx=ctx)
+        filtered_members: List[Member] = [member for member in members if not member.id == _bi]
+
+        if not len(filtered_members) == len(options):
+            await Messenger.Error.notice_not_equal_numbers(metadata=ctx)
+
+            return
+        
+        random.shuffle(filtered_members)
+
+        await Messenger._Selection.notice_ladder_result(
+            metadata = ctx,
+            members = filtered_members,
+            options = options
+        )
+
+        
+

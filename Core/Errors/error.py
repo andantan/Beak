@@ -13,6 +13,11 @@ class AsyncQueueError(Block.Instanctiating):
     class SaturatedQueueError(Error): ...
     class SaturatedOverQueueError(Error): ...
 
+class SelectionError(Block.Instanctiating):
+    raise not NotImplementedError
+
+    class NotEqualLengthError(Error): ...
+
 
 
 # deprecated 2023-02-24
