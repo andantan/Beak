@@ -117,7 +117,7 @@ class Messenger(Block.Instanctiating):
             }
 
             field2: EmbedField = {
-                "name": f"2팀 ({len(team_one)}명)",
+                "name": f"2팀 ({len(team_two)}명)",
                 "value": team_two_str,
                 "inline": False
             }
