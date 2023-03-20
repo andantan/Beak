@@ -24,7 +24,8 @@ from Data.Paraments.settings import (
     ATTACHED_PLAYLIST_EMBED_COLOR,
     ENDED_PLAYLIST_NOTICE_COLOR,
     QUEUE_THRESHOLD,
-    OVER_QUEUE_THRESHOLD
+    OVER_QUEUE_THRESHOLD,
+    STRING_LENGTH_THRESHOLD
 )
 
 
@@ -459,11 +460,15 @@ class BeakNotification(Block.Instanctiating):
 
                 prev_audio_value = "첫 번째 음원입니다." \
                                     if player.is_overqueue_empty \
-                                    else player.seek_overqueue.get("title")
+                                    else player.seek_overqueue.get("title").strip()
+                
+                prev_audio_value = prev_audio_value[:STRING_LENGTH_THRESHOLD]
 
-                next_audio_value = player.reference_queue.__getitem__(1).get("title") \
+                next_audio_value = player.reference_queue.__getitem__(1).get("title").strip() \
                                     if player.is_queue_two_or_more \
                                     else "마지막 음원입니다."
+                
+                next_audio_value = next_audio_value[:STRING_LENGTH_THRESHOLD]
 
                 waiting_value = "∞" if player.is_loop_mode else f"{len(player.reference_queue) - 1}개"
 
@@ -565,8 +570,8 @@ class BeakNotification(Block.Instanctiating):
                         break
 
                     option = SelectOption(
-                        label = f"{index + 1} - {audio.get('title')[:100]}",
-                        description = f"{audio.get('uploader')[:100]}",
+                        label = f"{index + 1} - {audio.get('title')[:STRING_LENGTH_THRESHOLD]}",
+                        description = f"{audio.get('uploader')[:STRING_LENGTH_THRESHOLD]}",
                         value = f"{index}"
                     )
 
@@ -602,8 +607,8 @@ class BeakNotification(Block.Instanctiating):
                         break
 
                     option = SelectOption(
-                        label = f"{index + 1} - {audio.get('title')[:100]}",
-                        description = f"{audio.get('uploader')[:100]}",
+                        label = f"{index + 1} - {audio.get('title')[:STRING_LENGTH_THRESHOLD]}",
+                        description = f"{audio.get('uploader')[:STRING_LENGTH_THRESHOLD]}",
                         value = f"{index + 1}"
                     )
 
@@ -1023,9 +1028,12 @@ class Generator(Block.Instanctiating):
 
             try:
                 for index, audio in enumerate(guild_queue):
+                    _label: str = f"{index + 1} - {audio.get('title')}"[:STRING_LENGTH_THRESHOLD]
+                    _uploader: str = f"{audio.get('uploader')}"[:STRING_LENGTH_THRESHOLD]
+
                     option = SelectOption(
-                        label = f"{index + 1} - {audio.get('title')}",
-                        description = f"{audio.get('uploader')}",
+                        label = _label,
+                        description = _uploader,
                         value = f"{index + 1}"
                     )
 

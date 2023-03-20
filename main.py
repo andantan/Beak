@@ -30,7 +30,7 @@ from Core.beak import Beak
 LOGGING = True
 PATCHING = False
 
-__version__ = "v3.2.4.04"
+__version__ = "v3.2.4"
 __patch_version__ = "v3.2.5"
 
 intents = Intents.default()
@@ -144,7 +144,7 @@ async def breset(ctx: Context) -> None:
     await beak.beak_player_reset(ctx=ctx)
 
 
-@bot.command(aliases=["exit", "퇴장"])
+@bot.command(aliases=["exit", "stop", "퇴장", "정지"])
 async def bexit(ctx: Context) -> None:
     await ctx.message.delete()
 
@@ -217,7 +217,7 @@ async def bhelp(ctx: Context) -> None:
     )
 
     embed.add_field(
-        name = "퇴장 명령어: ~exit 또는 ~퇴장",
+        name = "퇴장 명령어: ~exit, ~stop, ~퇴장, ~정지",
         value = "Beak를 강제로 퇴장시킵니다.",
         inline = False
     )
@@ -234,31 +234,11 @@ async def bhelp(ctx: Context) -> None:
         inline = False
     )
 
-    # deprecated 2023-02-24
-    #
-    # embed.add_field(
-    #     name = "버튼:  🔄️",
-    #     value = "현재 재생 중인 음원을 제외한 모든 대기열을 초기화합니다.",
-    #     inline = False
-    # )
-
-    # embed.add_field(
-    #     name = "버튼:  🗑️",
-    #     value = "다음 대기 중인 음원 1개를 삭제합니다.",
-    #     inline = False
-    # )
-
-    # embed.add_field(
-    #     name = "버튼:  📜",
-    #     value = "현재 재생 중인 음원을 기준으로 재생 완료된 음원 2개, 대기 중인 음원 2개를 출력합니다.",
-    #     inline = False
-    # )
-
-    # embed.add_field(
-    #     name = "버튼:  🛠️  ( 버그 발견 및 해결 중 → 버튼 임시 비활성화 )",
-    #     value = "플레이어가 버그에 걸리거나 오류 발생 시 현상을 해결한 후 재입장시킵니다.",
-    #     inline = False
-    # )
+    embed.add_field(
+        name = "사다리 명령여: ~사다리 (옵션1) (옵션2) ... ",
+        value = "현재 유저가 입장한 음성 채널 내의 인원에게 랜덤으로 옵션을 부여합니다.",
+        inline = False
+    )
 
     embed.set_footer(
         text = "Beak By Qbean"
