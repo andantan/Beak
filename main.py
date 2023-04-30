@@ -1,6 +1,6 @@
 import sys
 
-from typing import Optional
+from typing import Optional, List
 
 import discord
 import validators
@@ -24,14 +24,11 @@ from Core.Utils.utils import Selection
 from Core.beak import Beak
 
 
-
-
-
 LOGGING = True
 PATCHING = False
 
-__version__ = "v3.2.4"
-__patch_version__ = "v3.2.5"
+__version__ = "v3.2.6.02"
+__patch_version__ = "v3.2.6.03"
 
 intents = Intents.default()
 intents.members = True
@@ -256,15 +253,48 @@ async def bextract(ctx: Context, url: str) -> None:
 
 
 @bot.command(aliases=[f"{ADMINISTRATOR_COMMAND_PREFIX}sudo"])
-async def execute_DSC(ctx: Context, *args):
+async def executer(ctx: Context, *args):
     if Storage.Identification().is_admin(ctx.author.id):
         commands: str = args.__getitem__(0)
 
         if commands == "-n" or commands == "--notice":
             try:
-                channel = bot.get_channel(int(args.__getitem__(1)))
+                notification_mode = args.__getitem__(1)
+                notification_guild_id = int(args.__getitem__(2))
+                channel = bot.get_channel(notification_guild_id)
 
-                await channel.send(f"{' '.join(args[2:])}")
+                if notification_mode == "normal":
+                    message_argument = args[3:]
+                    message: str = f"{' '.join(message_argument)}"
+                    
+                    await channel.send(message)
+                
+                elif notification_mode == "embed":
+                    import ast
+                    
+                    embed_arguments: List[str] = args[3:]
+
+                    _embed = discord.Embed(
+                        title = "🤖  Beak 공지  🤖",
+                        color = 0x22c4ec
+                    )
+
+                    try:
+                        for embed_data in embed_arguments:
+                            _e: List = ast.literal_eval(embed_data)
+                            
+                            _embed.add_field(
+                                name = _e.__getitem__(0),
+                                value = _e.__getitem__(1),
+                                inline = _e.__getitem__(2)
+                            )
+                        else:
+                            _embed.set_footer(text="Beak-Logger by Qbean")
+                    except Exception as e:
+                        print(e)
+
+                    await channel.send(embed=_embed)
+                    
 
             except Exception as e:
                 print(e)

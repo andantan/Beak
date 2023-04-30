@@ -182,13 +182,13 @@ class Logger(Block.Instanctiating):
         @staticmethod
         async def notice_patching(metadata: Metadata, now_version: Version, update_version: Version) -> None:
             values: EmbedValues = {
-                "title" : f"Beak-DSC", 
+                "title" : f"서버 점검 알림", 
                 "description" : f"현재 Beak 패치 및 업데이트 중입니다.",
                 "color" : DSC_NOTICE_EMBED_COLOR
             }
 
             field: EmbedField = {
-                "name": "Supervisor executed",
+                "name": "Supervisor notification",
                 "value": f"현 버전: {now_version}, 패치 버전: {update_version}",
                 "inline": False
             }
