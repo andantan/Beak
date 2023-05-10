@@ -1,7 +1,7 @@
 import sys
 
 from typing import Optional, List
-
+import ast
 import discord
 import validators
 import youtubesearchpython
@@ -273,7 +273,7 @@ async def executer(ctx: Context, *args):
                     import ast
                     
                     embed_arguments: List[str] = args[3:]
-
+                    # 🤖  Beak alert  🤖
                     _embed = discord.Embed(
                         title = "🤖  Beak 공지  🤖",
                         color = 0x22c4ec
