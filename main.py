@@ -26,6 +26,7 @@ from Core.beak import Beak
 
 LOGGING = True
 PATCHING = False
+INSPECTION = False
 
 __version__ = "v3.2.6.02"
 __patch_version__ = "v3.2.6.03"
@@ -58,6 +59,12 @@ async def on_ready():
         await bot.change_presence(
             activity = discord.Game(
             name = f"업데이트(버전: {__patch_version__})"
+            )
+        )
+    elif INSPECTION:
+        await bot.change_presence(
+            activity = discord.Game(
+            name = f"서버 점검 및 패치"
             )
         )
     else:
@@ -98,6 +105,10 @@ async def bplay(ctx: Context, *args) -> None:
             )
 
             return
+        
+    if INSPECTION:
+        if not Storage.Identification().is_admin(ctx.author.id):
+            await beak.beak_inspection(ctx=ctx)
 
     if len(args) == 0:
         await CommandNotification.Error.notice_missing_required_arguments(ctx=ctx)
@@ -334,8 +345,10 @@ if __name__ == "__main__":
     try:
         patch_argv: str = sys.argv[1]
 
-        if patch_argv.__eq__("patch"):
+        if patch_argv.__eq__("--patch") or patch_argv.__eq__("-p"):
             PATCHING = True
+        elif patch_argv.__eq__("--inspection") or patch_argv.__eq__("-i"):
+            INSPECTION = True
     except IndexError:
         ...
     finally:

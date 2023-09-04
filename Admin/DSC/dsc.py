@@ -47,6 +47,11 @@ class DSC(Block.Instanctiating):
                 update_version=__patch_version__
             )
 
+        
+        @staticmethod
+        async def notice_inspection(metadata: Metadata) -> None:
+            await Logger.EmbedNotification.notice_inspection(metadata=metadata)
+
 
         @staticmethod
         async def notice_not_authorized_user(metadata: Metadata) -> None:
@@ -199,6 +204,26 @@ class Logger(Block.Instanctiating):
 
             await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values, fields=fields)
 
+        
+        @staticmethod
+        async def notice_inspection(metadata: Metadata) -> None:
+            values: EmbedValues = {
+                "title" : f"서버 점검 알림", 
+                "description" : f"현재 Beak 버그 현상 확인 및 조치 중입니다..",
+                "color" : DSC_NOTICE_EMBED_COLOR
+            }
+
+            field: EmbedField = {
+                "name": "Supervisor notification",
+                "value": f"현재 모든 명령어는 입력 불가능입니다.",
+                "inline": False
+            }
+            
+            fields: EmbedFields = [
+                field
+            ]
+
+            await Logger.EmbedNotification.embed_wrapper(metadata=metadata, values=values, fields=fields)
 
         @staticmethod
         async def notice_not_authorized_user(ctx: Context) -> None:

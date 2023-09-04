@@ -2,6 +2,8 @@ from typing import (
     Dict, List, Optional
 )
 
+from pprint import pprint as pp
+
 import asyncio
 import discord
 
@@ -79,6 +81,9 @@ class Beak(metaclass=Singleton):
     async def beak_patching(self, ctx: Context, **kwargs) -> None:
         await DSC.Supervisor.notice_patching(metadata=ctx, **kwargs)
 
+    
+    async def beak_inspection(self, ctx: Context) -> None:
+        await DSC.Supervisor.notice_inspection(metadata=ctx)
 
     def __alloc_pool__(self, guild_id: int, voice_client: VoiceClient) -> None:
         if guild_id in self.player_pool:
@@ -208,6 +213,8 @@ class Beak(metaclass=Singleton):
 
             guild_player = self.__get_guild_player(guild_id)
             guild_player.enqueue(audios=audios)
+
+            pp(audios, indent=4)
 
             await BeakNotification.Playlist.deploy(ctx=ctx, player=guild_player)
 
